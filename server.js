@@ -33,7 +33,6 @@ app.get("/rules", function(req, res){
     });
 });
 
-
 app.configure("production", function () {
     app.listen(20300);
     console.log("Listen on 20300!");
