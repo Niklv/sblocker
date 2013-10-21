@@ -33,5 +33,13 @@ app.get("/rules", function(req, res){
     });
 });
 
-app.listen(22222);
-console.log("started at 22222 port");
+
+app.configure("production", function () {
+    app.listen(20300);
+    console.log("Listen on 20300!");
+});
+
+app.configure("development", function () {
+    app.listen(20301);
+    console.log("Listen on 20301!");
+});
