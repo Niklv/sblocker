@@ -1,4 +1,8 @@
-sblocker
+Social SMS Blocker
 ========
+Проект смс спамфильтра.
 
-sblocker project
+Бранчи
+--------
+* server
+* android
