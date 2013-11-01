@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">SSB1</string>
+    <string name="text_welcome">Welcome to Social Sms Blocker!</string>
+    <string name="text_switch_interceptor">Switch interceptor</string>
+    <string name="text_clear_database">Clear database</string>
+    <string name="text_update_database">Update database</string>
+	<string name="text_show_database">Show database</string>
+    
+</resources>

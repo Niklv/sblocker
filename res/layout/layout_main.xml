@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+	<TextView
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:textSize="20sp"
+	    android:text="@string/text_welcome"
+	    />   
+	
+	<Button
+        android:id="@+id/btnSwitchInterceptor"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:onClick="onClickSwitchInterceptor"
+    	android:textSize="30sp"
+    	android:text="@string/text_switch_interceptor"
+    	/>
+	
+	<Button
+        android:id="@+id/btnClearDatabase"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:onClick="onClickClearDatabase"
+    	android:textSize="30sp"
+    	android:text="@string/text_clear_database"
+    	/>
+	
+	<Button
+        android:id="@+id/btnUpdateDatabase"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:onClick="onClickUpdateDatabase"
+    	android:textSize="30sp"
+    	android:text="@string/text_update_database"
+    	/>
+	
+	<Button
+        android:id="@+id/btnShowDatabase"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:onClick="onClickShowDatabase"
+    	android:textSize="30sp"
+    	android:text="@string/text_show_database"
+    	/>
+
+</LinearLayout>
