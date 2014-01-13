@@ -1,36 +1,49 @@
 var env = process.env;
 var express = require('express');
 var app = express();
+var mongoose = require('mongoose');
+var mongo = {
+    user: "developer",
+    pwd: "fwaocbnw3rwctn38ctfgw38x4nt0crtfnzxmg4t30nwct043",
+    url: "37.139.15.10:27017",
+    db: "sblocker"
+};
 
-app.get("/rules", function(req, res){
-    res.json({
-        "rules": [
-            {
-                "id": 1,
-                "type": "block",
-                "number": "89165798450",
-                "reason": "spam",
-                "description": "Шлюз рассылки спам сообщений",
-                "date": 1382363014323
-            },
-            {
-                "id": 2,
-                "type": "block",
-                "number": "Kupi_Avto",
-                "reason": "thief",
-                "description": "Заблокирован из-за мошенничества с покупкой автомобилей",
-                "date": 1382363030386
-            },
-            {
-                "id": 3,
-                "type": "allow",
-                "number": "900",
-                "reason": "bank-info number",
-                "description": "Номер шлюза сообщений сбербанка",
-                "date": 1382363201109
-            }
-        ]
+
+
+
+
+mongoose.connect('mongodb://' + mongo.user + ':' + mongo.pwd + '@' + mongo.url + '/' + mongo.db);
+
+app.get("/db", function (req, res) {
+    app.db.blaclist.find(function (err, data) {
+        if (err) {
+            console.log(err);
+            res.json({err: "Error while getting data from db"})
+        }
+        else
+            res.json({db:data});
+
     });
+});
+
+app.db = mongoose.connection;
+app.db.on("error", function (err) {
+    console.log(err);
+});
+app.db.once("open", function () {
+    console.log("connection to mongo - ok");
+    app.db.blaclist = mongoose.model('blacklist', new mongoose.Schema({
+        ph: String,
+        time: Number
+    }));
+    /*var black_number = new app.db.blaclist({
+     ph:"SPAM_NUMBER",
+     time: new Date().getTime()
+     }).save(function(err, num){console.log(err, num)});*/
+    /*app.db.blaclist.find(function (err, data) {
+     console.log(data)
+     });*/
 });
 
 app.configure("production", function () {
