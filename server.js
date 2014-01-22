@@ -5,36 +5,42 @@ var async = require('async');
 var config = require('./config');
 var utils = require('./utils');
 var router = require('./router');
+var models = require('./models');
 var app = express();
 
 function start() {
     async.auto({
         mongo: function (cb) {
-            console.log("mongo");
+            console.log("Init MongoDB");
             app.db = mongoose.connection;
             app.db.on("error", cb);
             app.db.once("open", cb);
             mongoose.connect(utils.getConnectionUrl());
         },
-        schemas: ['mongo', function (cb) {
-            console.log("schemas");
+        models: ['mongo', function (cb) {
+            console.log("Bound models");
+            app.models = {
+                blacklist: mongoose.model('blacklist', models.blacklist),
+                user: mongoose.model('user', models.user)
+            };
             cb(null);
         }],
         redis: function (cb) {
-            console.log("redis");
+            console.log("Init Redis");
             cb(null);
         },
         router: ['mongo', 'redis', function (cb) {
-            console.log("router");
+            console.log("Init router");
             cb(null);
         }],
-        precompile: function(cb){
-            console.log("precompile");
+        precompile: function (cb) {
+            console.log("Precompile units");
             utils.generate_phone_regexp();
+            utils.generate_code_regexp();
             cb(null);
         },
         server: ['router', function (cb) {
-            console.log("server");
+            console.log("Configure server");
             app.set('port', config[app.get("env")].port);
             app.configure("production", function () {//prod config
                 production();
@@ -70,7 +76,6 @@ function development() {
 }
 
 
-
 /*app.get("/db", function (req, res) {
  app.db.blaclist.find(function (err, data) {
  if (err) {
@@ -83,7 +88,7 @@ function development() {
  });
  });
 
-*/
+ */
 
 start();
 
