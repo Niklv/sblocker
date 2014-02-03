@@ -5,6 +5,12 @@
     <string name="text_switch_interceptor">Switch interceptor</string>
     <string name="text_clear_database">Clear database</string>
     <string name="text_update_database">Update database</string>
+    <string name="text_request_database">Request database</string>
 	<string name="text_show_database">Show database</string>
-    
+	<string name="text_confirm_registration">confirm registration</string>
+	<string name="text_request_registration">request regcode</string>
+	<string name="text_init_database">init database</string>
+	<string name="text_enter_phone">enter number</string>
+	<string name="text_report">report</string>
+	
 </resources>

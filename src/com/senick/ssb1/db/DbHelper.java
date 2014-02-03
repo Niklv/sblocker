@@ -11,6 +11,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class DbHelper extends SQLiteOpenHelper {
 
 	private static final String LOG_TAG = "DbHelper";
@@ -41,14 +44,8 @@ public class DbHelper extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	public void deleteEntries() {
+	public void deleteSenderEntries() {
 		SQLiteDatabase db = this.getWritableDatabase();
-		try {
-			db.execSQL(VariableContract.DELETE_ENTRIES);
-			Log.v(LOG_TAG, "variable_delete_entries: success");
-		} catch (Exception e) {
-			Log.v(LOG_TAG, "variable_delete_entries: exception");
-		}
 		try {
 			db.execSQL(SenderContract.DELETE_ENTRIES);
 			Log.v(LOG_TAG, "sender_delete_entries: success");
@@ -57,49 +54,112 @@ public class DbHelper extends SQLiteOpenHelper {
 		}
 	}
 	
+	public void deleteVariableEntries() {
+		SQLiteDatabase db = this.getWritableDatabase();
+		try {
+			db.execSQL(VariableContract.DELETE_ENTRIES);
+			Log.v(LOG_TAG, "variable_delete_entries: success");
+		} catch (Exception e) {
+			Log.v(LOG_TAG, "variable_delete_entries: exception");
+		}
+	}
+	
+	public void updateDatabase(String strDb) {
+		try {
+			deleteSenderEntries();
+			JSONObject jsonObjDb = new JSONObject(strDb);
+			JSONArray jsonArrDb = jsonObjDb.getJSONArray("blacklist");
+			for (int i = 0; i < jsonArrDb.length(); i++) {
+		        JSONObject jsonObjItem = jsonArrDb.getJSONObject(i);
+		        String number = jsonObjItem.getString("ph");
+		        String date = jsonObjItem.getString("createdAt");
+		        addSender(number, date);
+		      }
+			Log.v(LOG_TAG, "json parsed");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void initTables() {
 		Log.v(LOG_TAG, "init tables");
     	SQLiteDatabase db = getWritableDatabase();
-    	ContentValues values = new ContentValues();
-    	values.put(SenderContract.SenderEntry._ID, 1);
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_NUMBER, "89165798450");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_TYPE, "block");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_REASON, "spam");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_DESCRIPTION, "zadolbal");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_DATE, "1382363014323");
-    	long id = db.insert(SenderContract.SenderEntry.TABLE_NAME, null, values);
+    	ContentValues senderValues = new ContentValues();
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_NUMBER, "89165798450");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_TYPE, "block");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_REASON, "spam");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_DESCRIPTION, "zadolbal");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_DATE, "1382363014323");
+    	long id = db.insert(SenderContract.SenderEntry.TABLE_NAME, null, senderValues);
     	Log.v(LOG_TAG, "inserted entry, id = " + id);
     	    	
-        values = new ContentValues();
-    	values.put(SenderContract.SenderEntry._ID, 2);
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_NUMBER, "Kupi_Avto");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_TYPE, "block");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_REASON, "thief");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_DESCRIPTION, "zablockirovan");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_DATE, "1382363030386");
-    	id = db.insert(SenderContract.SenderEntry.TABLE_NAME, null, values);
+    	senderValues = new ContentValues();
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_NUMBER, "Kupi_Avto");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_TYPE, "block");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_REASON, "thief");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_DESCRIPTION, "zablockirovan");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_DATE, "1382363030386");
+    	id = db.insert(SenderContract.SenderEntry.TABLE_NAME, null, senderValues);
     	Log.v(LOG_TAG, "inserted entry, id = " + id);
 
-    	values = new ContentValues();
-    	values.put(SenderContract.SenderEntry._ID, 3);
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_NUMBER, "900");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_TYPE, "allow");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_REASON, "bank-info number");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_DESCRIPTION, "shluz sberbanka");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_DATE, "1382363201109");
-    	id = db.insert(SenderContract.SenderEntry.TABLE_NAME, null, values);
+    	senderValues = new ContentValues();
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_NUMBER, "900");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_TYPE, "allow");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_REASON, "bank-info number");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_DESCRIPTION, "shluz sberbanka");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_DATE, "1382363201109");
+    	id = db.insert(SenderContract.SenderEntry.TABLE_NAME, null, senderValues);
     	Log.v(LOG_TAG, "inserted entry, id = " + id);
     	
-    	values = new ContentValues();
-    	values.put(SenderContract.SenderEntry._ID, 4);
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_NUMBER, "s.itsoft.ru");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_TYPE, "block");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_REASON, "spam");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_DESCRIPTION, "shluz spama");
-    	values.put(SenderContract.SenderEntry.COLUMN_NAME_DATE, "1382363201109");
-    	id = db.insert(SenderContract.SenderEntry.TABLE_NAME, null, values);
+    	senderValues = new ContentValues();
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_NUMBER, "s.itsoft.ru");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_TYPE, "block");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_REASON, "spam");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_DESCRIPTION, "shluz spama");
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_DATE, "1382363201109");
+    	id = db.insert(SenderContract.SenderEntry.TABLE_NAME, null, senderValues);
+    	Log.v(LOG_TAG, "inserted entry, id = " + id);
+    	
+    	
+    	ContentValues variableValues = new ContentValues();
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_NAME, VariableContract.Variables.SERVER_IP);
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_VALUE, "192.168.0.60");
+    	id = db.insert(VariableContract.VariableEntry.TABLE_NAME, null, variableValues);
+    	Log.v(LOG_TAG, "inserted entry, id = " + id);
+    	
+    	variableValues = new ContentValues();
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_NAME, VariableContract.Variables.SERVER_PORT);
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_VALUE, "20301");
+    	id = db.insert(VariableContract.VariableEntry.TABLE_NAME, null, variableValues);
+    	Log.v(LOG_TAG, "inserted entry, id = " + id);
+    	
+    	variableValues = new ContentValues();
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_NAME, VariableContract.Variables.SERVER_METHOD_CODE);
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_VALUE, "code");
+    	id = db.insert(VariableContract.VariableEntry.TABLE_NAME, null, variableValues);
+    	Log.v(LOG_TAG, "inserted entry, id = " + id);
+    	
+    	variableValues = new ContentValues();
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_NAME, VariableContract.Variables.SERVER_METHOD_DB);
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_VALUE, "db");
+    	id = db.insert(VariableContract.VariableEntry.TABLE_NAME, null, variableValues);
+    	Log.v(LOG_TAG, "inserted entry, id = " + id);
+    	
+    	variableValues = new ContentValues();
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_NAME, VariableContract.Variables.SERVER_METHOD_REPORT);
+    	variableValues.put(VariableContract.VariableEntry.COLUMN_NAME_VALUE, "report");
+    	id = db.insert(VariableContract.VariableEntry.TABLE_NAME, null, variableValues);
     	Log.v(LOG_TAG, "inserted entry, id = " + id);
     	    	
+	}
+	
+	public long addSender(String number, String date) {
+		SQLiteDatabase db = getWritableDatabase();
+    	ContentValues senderValues = new ContentValues();
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_NUMBER, number);
+    	senderValues.put(SenderContract.SenderEntry.COLUMN_NAME_DATE, date);
+    	long id = db.insert(SenderContract.SenderEntry.TABLE_NAME, null, senderValues);
+    	return id;
 	}
 	
 	public ArrayList<Map<String,Object>> getAllSenders() {
@@ -140,7 +200,35 @@ public class DbHelper extends SQLiteOpenHelper {
 		return result;
 	}
 	
+	public String getVariable(String name) {
+		try {
+			SQLiteDatabase db = getReadableDatabase();
+		    String selection = 	VariableContract.VariableEntry.COLUMN_NAME_NAME + " = '" + name + "';";
+		    String[] cols = {VariableContract.VariableEntry._ID, VariableContract.VariableEntry.COLUMN_NAME_VALUE};
+			Cursor c = db.query(
+					VariableContract.VariableEntry.TABLE_NAME,
+					cols,
+					selection,
+					null,
+					null,
+					null,
+					null
+					);
+			int count = c.getCount();
+			if ( count != 1) {
+				return null;
+			}
+			c.moveToFirst();
+			String value = c.getString(c.getColumnIndexOrThrow(VariableContract.VariableEntry.COLUMN_NAME_VALUE));
+			return value;
+		} catch (Exception e) {
+			Log.v(LOG_TAG, "getVariable: expection");
+			return null;
+		}
+	}
+	
 	public boolean isSpam(String sender) {
+		return true;/*
 		try {
 			SQLiteDatabase db = getReadableDatabase();
 		    String selection = 	SenderContract.SenderEntry.COLUMN_NAME_NUMBER + " = '" + sender + "' AND " +
@@ -156,13 +244,21 @@ public class DbHelper extends SQLiteOpenHelper {
 					null
 					);
 			int count = c.getCount();
-			if (count > 0) {
-				return true;
+			if (count <= 0) {
+				return false;
+			}
+			c.moveToFirst();
+			for (int i=0; i < count; i++) {
+				String number = c.getString(c.getColumnIndexOrThrow(SenderContract.SenderEntry.COLUMN_NAME_NUMBER));
+				if ( number.equals(sender)) {
+					return true;
+				}
+				c.moveToNext();
 			}
 			return false;
 		} catch (Exception e) {
 			Log.v(LOG_TAG, "getVariable: expection");
 			return false;
-		}
+		}*/
 	}
 }

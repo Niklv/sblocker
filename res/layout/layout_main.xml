@@ -14,7 +14,7 @@
         android:id="@+id/btnSwitchInterceptor"
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
-    	android:onClick="onClickSwitchInterceptor"
+    	android:onClick="onClick"
     	android:textSize="30sp"
     	android:text="@string/text_switch_interceptor"
     	/>
@@ -23,7 +23,7 @@
         android:id="@+id/btnClearDatabase"
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
-    	android:onClick="onClickClearDatabase"
+    	android:onClick="onClick"
     	android:textSize="30sp"
     	android:text="@string/text_clear_database"
     	/>
@@ -32,18 +32,41 @@
         android:id="@+id/btnUpdateDatabase"
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
-    	android:onClick="onClickUpdateDatabase"
+    	android:onClick="onClick"
     	android:textSize="30sp"
     	android:text="@string/text_update_database"
+    	/>
+	
+	<Button
+        android:id="@+id/btnRequestDatabase"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:onClick="onClick"
+    	android:textSize="30sp"
+    	android:text="@string/text_request_database"
+    	/>
+	
+	<Button
+        android:id="@+id/btnShowReport"
+    	android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+    	android:onClick="onClick"
+    	android:textSize="30sp"
+    	android:text="@string/text_report"
     	/>
 	
 	<Button
         android:id="@+id/btnShowDatabase"
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
-    	android:onClick="onClickShowDatabase"
+    	android:onClick="onClick"
     	android:textSize="30sp"
     	android:text="@string/text_show_database"
     	/>
-
+	<TextView
+        android:id="@+id/tvServerMainResult"
+	    android:layout_width="match_parent"
+    	android:layout_height="wrap_content"
+	    android:textSize="20sp"
+	    />
 </LinearLayout>
