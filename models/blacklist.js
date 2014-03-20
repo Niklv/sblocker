@@ -31,6 +31,10 @@ var blacklist_stat = new Schema({
 });
 
 
+var type = new Schema({ //TODO: fill
+
+});
+
 var reason = new Schema({
     desc: {
         type: String,
@@ -50,9 +54,11 @@ var reason = new Schema({
 var Blacklist = Model('blacklist', blacklist);
 var Blacklist_stat = Model('blacklist_stat', blacklist_stat);
 var Reason = Model('reason', reason);
+var Type = Model('type', type);
 
 module.exports = {
-    blacklist:Blacklist,
+    blacklist: Blacklist,
     blacklist_stat: Blacklist_stat,
+    type: Type,
     reason: Reason
 };
