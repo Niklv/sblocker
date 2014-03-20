@@ -24,7 +24,9 @@
     "async": "~0.2.10",
     "passport": "~0.2.0",
     "passport-local": "~1.0.0",
-    "underscore": "^1.6.0"
+    "underscore": "^1.6.0",
+    "winston": "^0.7.2",
+    "body-parser": "^1.0.0"
   },
   "engines": {
     "node": ">=0.10",
