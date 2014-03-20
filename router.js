@@ -1,6 +1,6 @@
-var utils = require('./utils');
-var config = require('./config');
-var error = require('./errors');
+var utils = require('./utils/utils');
+var config = require('./utils/config');
+var error = require('./utils/errors');
 var async = require('async');
 
 var router = {
@@ -89,10 +89,10 @@ var router = {
                 }],
                 save: ['user', function (cb, r) {
                     r.user.confirmed = true;
-                    utils.generateKey(function(key){
+                    utils.generateKey(function (key) {
                         r.user.key = key;
-                        r.user.save(function(err){
-                            if(err)
+                        r.user.save(function (err) {
+                            if (err)
                                 cb(error(3, err));
                             else
                                 cb(null);
@@ -112,11 +112,11 @@ var router = {
         });
 
         app.get("/db", function (req, res) {
-            app.models.blacklist.find({},function(err, data){
-                if(err)
+            app.models.blacklist.find({}, {ph: 1, bl: 1, r: 1, _id: 0}, function (err, data) {
+                if (err)
                     res.json(error(3, err));
                 else
-                    res.json({blacklist:data, time:new Date().getTime()});
+                    res.json({list: data, time: new Date().getTime()});
             });
         });
 
@@ -131,7 +131,7 @@ var router = {
                 },
                 item: ['parse', function (cb, r) {
                     var bl = r.parse;
-                    app.models.blacklist.findOne({ph:bl}, function (err, item) {
+                    app.models.blacklist.findOne({ph: bl}, function (err, item) {
                         if (err)
                             cb(error(3, err));
                         else if (item)

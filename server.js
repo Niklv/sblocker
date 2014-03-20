@@ -2,10 +2,10 @@ var env = process.env;
 var express = require('express');
 var mongoose = require('mongoose');
 var async = require('async');
-var config = require('./config');
-var utils = require('./utils');
+var config = require('./utils/config');
+var utils = require('./utils/utils');
 var router = require('./router');
-var models = require('./models');
+var models = require('./models/models');
 var app = express();
 
 function start() {
@@ -16,15 +16,8 @@ function start() {
             app.db.on("error", cb);
             app.db.once("open", cb);
             mongoose.connect(utils.getConnectionUrl());
+            app.models = models;
         },
-        models: ['mongo', function (cb) {
-            console.log("Bound models");
-            app.models = {
-                blacklist: mongoose.model('blacklist', models.blacklist),
-                user: mongoose.model('user', models.user)
-            };
-            cb(null);
-        }],
         redis: function (cb) {
             console.log("Init Redis");
             cb(null);
@@ -56,6 +49,7 @@ function start() {
             console.log("Server start failed: " + err);
         else
             console.log("Server start complete!");
+        test();
     });
 }
 
@@ -74,6 +68,25 @@ function start() {
  */
 
 start();
+
+
+function test() {
+    //WARNING! DELETE ALL DATA
+    /*app.models.blacklist.remove({},function(err,data){
+     console.log(data);
+     app.models.blacklist.find({},function(err,data){
+     console.log(data);
+     });
+     });*/
+
+    /*app.models.user.find({},function(err,data){
+     console.log(data);
+     });*/
+    mongoose.connection.db.collectionNames(function (err, names) {
+        console.log(names); // [{ name: 'dbname.myCollection' }]
+    })
+
+}
 
 
 /*var black_number = new app.db.blaclist({

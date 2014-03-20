@@ -4,8 +4,8 @@ module.exports = {
             createdAt: {type: Number}
         });
         schema.pre('save', function (next) {
-            if (!this.at)
-                this.at = new Date().getTime();
+            if (!this.createdAt)
+                this.createdAt = new Date();
             next();
         });
     }
