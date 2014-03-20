@@ -2,16 +2,19 @@ var env = process.env;
 var express = require('express');
 var mongoose = require('mongoose');
 var async = require('async');
+var bodyParser = require('body-parser');
 var config = require('./utils/config');
 var utils = require('./utils/utils');
 var router = require('./router');
 var models = require('./models/models');
+var log = require('./utils/log')(module);
+
 var app = express();
 
 function start() {
     async.auto({
         mongo: function (cb) {
-            console.log("Init MongoDB");
+            log.info("Init MongoDB");
             app.db = mongoose.connection;
             app.db.on("error", cb);
             app.db.once("open", cb);
@@ -19,21 +22,22 @@ function start() {
             app.models = models;
         },
         redis: function (cb) {
-            console.log("Init Redis");
+            log.info("Init Redis");
             cb(null);
         },
         router: ['mongo', 'redis', function (cb) {
-            console.log("Init router");
+            log.info("Init router");
             cb(null);
         }],
         precompile: function (cb) {
-            console.log("Precompile units");
+            log.info("Precompile units");
             utils.generate_phone_regexp();
             utils.generate_code_regexp();
             cb(null);
         },
         server: ['router', function (cb) {
-            console.log("Configure server");
+            log.info("Configure server");
+            app.use(bodyParser());
             app.set('port', config[app.get("env")].port);
             router.bind(app);
             cb(null);
@@ -41,14 +45,14 @@ function start() {
         start: ['server', 'precompile', function (cb) {
             var port = app.get('port');
             app.listen(port);
-            console.log("Bound to " + port + " port");
+            log.info("Bound to " + port + " port");
             cb(null);
         }]
     }, function (err) {
         if (err)
-            console.log("Server start failed: " + err);
+            log.info("Server start failed: " + err);
         else
-            console.log("Server start complete!");
+            log.info("Server start complete!");
         test();
     });
 }
@@ -72,6 +76,10 @@ start();
 
 function test() {
     //WARNING! DELETE ALL DATA
+    var u = new app.models.user({});
+    u.save(function (err) {
+        log.error(err);
+    });
     /*app.models.blacklist.remove({},function(err,data){
      console.log(data);
      app.models.blacklist.find({},function(err,data){
@@ -82,10 +90,9 @@ function test() {
     /*app.models.user.find({},function(err,data){
      console.log(data);
      });*/
-    mongoose.connection.db.collectionNames(function (err, names) {
-        console.log(names); // [{ name: 'dbname.myCollection' }]
-    })
-
+    /*mongoose.connection.db.collectionNames(function (err, names) {
+     console.log(names); // [{ name: 'dbname.myCollection' }]
+     })*/
 }
 
 
