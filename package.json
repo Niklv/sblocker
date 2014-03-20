@@ -19,9 +19,11 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "4.*.*",
+    "express": "~4.0.0-rc3",
     "mongoose": "~3.8.8",
-    "async": "~0.2.10"
+    "async": "~0.2.10",
+    "passport": "~0.2.0",
+    "passport-local": "~1.0.0"
   },
   "engines": {
     "node": ">=0.10",
