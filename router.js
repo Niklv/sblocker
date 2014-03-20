@@ -112,11 +112,45 @@ var router = {
         });
 
         app.get("/db", function (req, res) {
-
+            app.models.blacklist.find({},function(err, data){
+                if(err)
+                    res.json(error(3, err));
+                else
+                    res.json({blacklist:data, time:new Date().getTime()});
+            });
         });
 
-        app.post("/db", function (req, res) {
-
+        app.post("/report", function (req, res) {
+            async.auto({
+                parse: function (cb) {
+                    var bl = req.query.bl;
+                    if (!bl)
+                        cb(error(8));
+                    else
+                        cb(null, bl);
+                },
+                item: ['parse', function (cb, r) {
+                    var bl = r.parse;
+                    app.models.blacklist.findOne({ph:bl}, function (err, item) {
+                        if (err)
+                            cb(error(3, err));
+                        else if (item)
+                            cb(null, item);
+                        else
+                            new app.models.blacklist({
+                                ph: bl
+                            }).save(cb);
+                    });
+                }]
+            }, function (err, r) {
+                if (err) {
+                    console.log(err);
+                    res.json(err);
+                } else {
+                    console.log(r.item);
+                    res.json({bl: r.item});
+                }
+            });
         });
     }
 };

@@ -42,14 +42,8 @@ function start() {
         server: ['router', function (cb) {
             console.log("Configure server");
             app.set('port', config[app.get("env")].port);
-            app.configure("production", function () {//prod config
-                production();
-                cb(null);
-            });
-            app.configure("development", function () {//dev config
-                development();
-                cb(null);
-            });
+            router.bind(app);
+            cb(null);
         }],
         start: ['server', 'precompile', function (cb) {
             var port = app.get('port');
@@ -64,17 +58,6 @@ function start() {
             console.log("Server start complete!");
     });
 }
-
-function production() {
-    app.use(express.errorHandler());
-    router.bind(app);
-}
-
-function development() {
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-    router.bind(app);
-}
-
 
 /*app.get("/db", function (req, res) {
  app.db.blaclist.find(function (err, data) {

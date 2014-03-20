@@ -1,38 +1,77 @@
 var mongoose = require('mongoose');
+var plugin = require('./mongoose-plugins');
+
 var Schema = mongoose.Schema;
 
 
 var blacklist = new Schema({
     ph: {
         type: String,
+        unique: true,
+        require: true,
         index: true
     },
-    time: Date
-}, { autoIndex: false });
+    bl: {
+        type: Number,
+        require: true
+    },
+    r: {
+        type: Number,
+        require: true
+    }
+});
+
+var blacklist_stats = new Schema({
+    item: {
+        type: Schema.Types.ObjectId,
+        ref: 'blacklist',
+        require: true
+    },
+    createdAt: {
+        type: Date
+    }
+});
+
+
+var reason = new Schema({
+    desc: {
+        type: String,
+        unique: true,
+        require: true,
+        index: true
+    },
+    n: {
+        type: Number,
+        require: true,
+        unique: true,
+        index: true
+    }
+});
 
 var user = new Schema({
-    ph: {
+    username: {
         type: String,
-        index: true
+        index: true,
+        unique: true,
+        required: true
     },
-    imei: {
+    password: {
         type: String,
-        index: true
+        required: true
     },
+    rating: {
+        type: Number,
+        default: 1,
+        required: true
+    },
+    ph: Array,
+    imei: Array,
     code: String,
-    since: {
-        type: Date,
-        default: Date.now
-    },
     confirmed: {
         type: Boolean,
         default: false
     },
-    key: {
-        type: String,
-        dafault: null
-    },
-    ban: {
+    is_banned: {
         type: Boolean,
         default: false
     },
@@ -40,12 +79,12 @@ var user = new Schema({
         type: Date,
         default: Date.now
     }
-}, { autoIndex: false });
-
-
+}).plugin(plugin.timestampsPlugin);
 
 
 module.exports = {
     blacklist: blacklist,
+    blacklist_stats: blacklist_stats,
+    reason: reason,
     user: user
 };

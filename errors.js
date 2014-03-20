@@ -7,7 +7,8 @@ var errors = {
     5: "code is not provided",
     6: "code format error",
     7: "wrong code",
-    total: 7
+    8: "empty blacklist item",
+    total: 8
 };
 
 
