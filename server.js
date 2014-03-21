@@ -13,7 +13,7 @@ var morgan = require('morgan');//var errorHandler = require('errorhandler');
 var config = require('./utils/config');
 var utils = require('./utils/utils');
 var api = require('./routers/api');
-var mongo = require('./models/mongoose');
+var mongo = require('./models');
 var log = require('./utils/log')(module);
 
 var app = express();

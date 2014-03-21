@@ -1,5 +1,5 @@
 var express = require("express");
-var models = require("../models/mongoose").models;
+var models = require("../models").models;
 
 var user = express.Router();
 
