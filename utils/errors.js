@@ -12,7 +12,7 @@ var errors = {
 };
 
 
-module.exports = function (code, desc, toLog) {
+exports = function (code, desc, toLog) {
     if (typeof code === "undefined") code = 0;
     if (typeof toLog === "undefined") toLog = false;
     var err = {

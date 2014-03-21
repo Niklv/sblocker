@@ -31,8 +31,19 @@ var blacklist_stat = new Schema({
 });
 
 
-var type = new Schema({ //TODO: fill
-
+var type = new Schema({
+    desc: {
+        type: String,
+        unique: true,
+        require: true,
+        index: true
+    },
+    n: {
+        type: Number,
+        require: true,
+        unique: true,
+        index: true
+    }
 });
 
 var reason = new Schema({

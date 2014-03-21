@@ -14,9 +14,6 @@ module.exports = {
             return error(2);
         return {str: phone[0]};
     },
-    getConnectionUrl: function () {
-        return 'mongodb://' + config.mongo.user + ':' + config.mongo.pwd + '@' + config.mongo.url + '/' + config.mongo.db
-    },
     generateKey: function (cb) {
         crypto.randomBytes(48, function (ex, buf) {
             cb(buf.toString('hex'));

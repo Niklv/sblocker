@@ -1,56 +1,54 @@
 var env = process.env;
+//libs
 var express = require('express');
-var mongoose = require('mongoose');
+var https = require('https');
+var http = require('http');
 var async = require('async');
+//middleware
 var bodyParser = require('body-parser');
+var methodOverride = require('method-override');
+var compress = require('compression');
+var morgan = require('morgan');//var errorHandler = require('errorhandler');
+//modules
 var config = require('./utils/config');
 var utils = require('./utils/utils');
-//var router = require('./router');
 var api = require('./routers/api');
-var models = require('./models/models');
+var mongo = require('./models/mongoose');
 var log = require('./utils/log')(module);
 
 var app = express();
+app.models = mongo.models;
+app.db = mongo.db;
 
 function start() {
     async.auto({
-        mongo: function (cb) {
-            log.info("Init MongoDB");
-            app.db = mongoose.connection;
-            app.db.on("error", cb);
-            app.db.once("open", cb);
-            mongoose.connect(utils.getConnectionUrl());
-            app.models = models;
-        },
-        redis: function (cb) {
-            log.info("Init Redis");
-            cb(null);
-        },
-        router: ['mongo', 'redis', function (cb) {
-            log.info("Init router");
-            cb(null);
-        }],
         precompile: function (cb) {
             log.info("Precompile units");
             utils.generate_phone_regexp();
             cb(null);
         },
-        server: ['router', function (cb) {
+        server: function (cb) {
             log.info("Configure server");
+            app.use(morgan('dev'));
+            app.use(compress());
             app.use(bodyParser());
+            app.use(methodOverride());
             app.use('/api', api.router);
-            app.set('port', config[app.get("env")].port);
             cb(null);
-        }],
+        },
         start: ['server', 'precompile', function (cb) {
-            var port = app.get('port');
-            app.listen(port);
-            log.info("Bound to " + port + " port");
+            var httpPort = config[app.get("env")].http.port;
+            var httpsPort = config[app.get("env")].https.port;
+            var options = config[app.get("env")].https.options;
+            http.createServer(app).listen(httpPort);
+            log.info("Http bound to " + httpPort + " port");
+            //https.createServer(options, app).listen(httpsPort);
+            //log.info("Https bound to " + httpsPort + " port");
             cb(null);
         }]
     }, function (err) {
         if (err)
-            log.info("Server start failed: " + err);
+            log.error("Server start error:", err);
         else
             log.info("Server start complete!");
         test();
