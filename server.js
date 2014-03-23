@@ -21,53 +21,22 @@ app.models = mongo.models;
 app.db = mongo.db;
 
 function start() {
-    async.auto({
-        precompile: function (cb) {
-            log.info("Precompile units");
-            utils.generate_phone_regexp();
-            cb(null);
-        },
-        server: function (cb) {
-            log.info("Configure server");
-            app.use(morgan('dev'));
-            app.use(compress());
-            app.use(bodyParser());
-            app.use(methodOverride());
-            app.use('/api', api.router);
-            cb(null);
-        },
-        start: ['server', 'precompile', function (cb) {
-            var httpPort = config[app.get("env")].http.port;
-            var httpsPort = config[app.get("env")].https.port;
-            var options = config[app.get("env")].https.options;
-            http.createServer(app).listen(httpPort);
-            log.info("Http bound to " + httpPort + " port");
-            //https.createServer(options, app).listen(httpsPort);
-            //log.info("Https bound to " + httpsPort + " port");
-            cb(null);
-        }]
-    }, function (err) {
-        if (err)
-            log.error("Server start error:", err);
-        else
-            log.info("Server start complete!");
-        test();
-    });
+    utils.generate_phone_regexp();
+    log.info("Configure server");
+    app.use(morgan('dev'));
+    app.use(compress());
+    app.use(bodyParser());
+    app.use(methodOverride());
+    app.use('/api', api.router);
+    var httpPort = config[app.get("env")].http.port;
+    http.createServer(app).listen(httpPort);
+    log.info("Http bound to " + httpPort + " port");
+    //var httpsPort = config[app.get("env")].https.port;
+    //var options = config[app.get("env")].https.options;
+    //https.createServer(options, app).listen(httpsPort);
+    //log.info("Https bound to " + httpsPort + " port");
+    log.info("Server start complete!");
 }
-
-/*app.get("/db", function (req, res) {
- app.db.blaclist.find(function (err, data) {
- if (err) {
- console.log(err);
- res.json({err: "Error while getting data from db"})
- }
- else
- res.json({db: data});
-
- });
- });
-
- */
 
 start();
 

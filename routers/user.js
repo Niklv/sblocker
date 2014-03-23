@@ -7,4 +7,14 @@ user.get('/', function (req, res) {
 
 });
 
+user.post('/login', function (req, res) {
+
+});
+
+user.post('/signup', function (req, res) {
+
+});
+
+
+
 exports.router = user;
