@@ -8,10 +8,12 @@ var async = require('async');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
 var compress = require('compression');
-var morgan = require('morgan');//var errorHandler = require('errorhandler');
+var morgan = require('morgan');
+var errorHandler = require('errorhandler');
 //modules
 var config = require('./utils/config');
 var utils = require('./utils/utils');
+var error = require('./utils/utils').router;
 var api = require('./routers/api');
 var mongo = require('./models');
 var log = require('./utils/log')(module);
@@ -21,16 +23,22 @@ app.models = mongo.models;
 app.db = mongo.db;
 
 function start() {
-    utils.generate_phone_regexp();
     log.info("Configure server");
     app.use(morgan('dev'));
     app.use(compress());
     app.use(bodyParser());
     app.use(methodOverride());
+    app.use(errorHandler());
     app.use('/api', api.router);
+    app.use(function(err, req, res, next){
+        console.error(err.stack);
+        res.send(500, 'Something broke!');
+    });
     var httpPort = config[app.get("env")].http.port;
-    http.createServer(app).listen(httpPort);
-    log.info("Http bound to " + httpPort + " port");
+    http.createServer(app).listen(httpPort).on('listening', function(){
+        log.info("Http bound to " + httpPort + " port");
+    });
+
     //var httpsPort = config[app.get("env")].https.port;
     //var options = config[app.get("env")].https.options;
     //https.createServer(options, app).listen(httpsPort);
