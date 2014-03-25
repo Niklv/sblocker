@@ -1,9 +1,11 @@
 var express = require("express");
 var validator = require("validator");
-var models = require("../models").models;
+var User = require("../models").models.user;
 var log = require("../utils/log")(module);
-var UsernameError = require('../utils/errors').UsernameError;
-var PasswordError = require('../utils/errors').PasswordError;
+var UsernameFormatError = require('../utils/errors').UsernameFormatError;
+var PasswordFormatError = require('../utils/errors').PasswordFormatError;
+var DuplicateError = require('../utils/errors').DuplicateError;
+var DatabaseError = require('../utils/errors').DatabaseError;
 
 var user = express.Router();
 
@@ -11,7 +13,7 @@ user.use('/', function (req, res, next) {
     if (req.app.db.readyState)
         next();
     else
-        res.send(500);
+        next(new DatabaseError("Not connected to db"));
 });
 
 
@@ -23,20 +25,39 @@ user.post('/login', function (req, res) {
 
 });
 
-user.post('/signup', function (req, res) {
-    var u = req.body.u, p = req.body.p;
-    log.info(u, p);
-    if (!validator.isEmail(u) || u.length < 6) {
-        throw new UsernameError("Wrong email");
+user.post('/signup', function (req, res, next) {
+    var u = req.body.u, p = req.body.p, e = req.body.u,
+        imei = req.body.imei, ph = req.body.ph;
+    //log.info(u, p);
+    if (!validator.isEmail(e) || e.length < 6) {
+        next(new UsernameFormatError());
+    } else if (!(typeof p === "string") || p.length < 6) {
+        next(new PasswordFormatError());
+    } else { //all is ok
+        var user = new User({
+            username: u,
+            email: e,
+            password: p,
+            imei: imei,
+            ph: ph
+        });
+        User.find({$or: [
+            {username: u},
+            {email: e}
+        ]}, {_id:1}, { limit: 1 }, function (err, users) {
+            if (err)
+                next(err);
+            else if (users)
+                next(new DuplicateError("User already exists"));
+            else
+                user.save(function (err, user) {
+                    if (err)
+                        next(err);
+                    else
+                        res.send(200, {message: "Check your email"});
+                });
+        });
     }
-    if (!(typeof p === "string") || p.length < 6) {
-        throw new PasswordError("Wrong password");
-    }
-
-    console.log("here");
-
-
-    res.send(200);
 });
 
 

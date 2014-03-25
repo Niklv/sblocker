@@ -25,7 +25,7 @@ module.exports = {
     mongo: {
         user: "developer",
         pwd: "fwaocbnw3rwctn38ctfgw38x4nt0crtfnzxmg4t30nwct043",
-        url: "37.139.15.10:27017",
+        url: "localhost:27017",//url: "37.139.15.10:27017",
         db: "sblocker"
     }
 };

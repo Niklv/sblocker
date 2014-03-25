@@ -3,17 +3,15 @@ var env = process.env;
 var express = require('express');
 var https = require('https');
 var http = require('http');
-var async = require('async');
 //middleware
 var bodyParser = require('body-parser');
-var methodOverride = require('method-override');
 var compress = require('compression');
 var morgan = require('morgan');
-var errorHandler = require('errorhandler');
+var cookieParser = require('cookie-parser');
 //modules
 var config = require('./utils/config');
 var utils = require('./utils/utils');
-var error = require('./utils/utils').router;
+var error = require('./utils/errors');
 var api = require('./routers/api');
 var mongo = require('./models');
 var log = require('./utils/log')(module);
@@ -24,18 +22,17 @@ app.db = mongo.db;
 
 function start() {
     log.info("Configure server");
-    app.use(morgan('dev'));
+    if (app.get('env') == 'development')
+        app.use(morgan('dev'));
     app.use(compress());
     app.use(bodyParser());
-    app.use(methodOverride());
-    app.use(errorHandler());
+    app.use(cookieParser());
+    //app.use(methodOverride());
     app.use('/api', api.router);
-    app.use(function(err, req, res, next){
-        console.error(err.stack);
-        res.send(500, 'Something broke!');
-    });
+    app.use(error.PageNotFound);
+    app.use(error.handler);
     var httpPort = config[app.get("env")].http.port;
-    http.createServer(app).listen(httpPort).on('listening', function(){
+    http.createServer(app).listen(httpPort).on('listening', function () {
         log.info("Http bound to " + httpPort + " port");
     });
 
@@ -65,17 +62,3 @@ function test() {
      console.log(names); // [{ name: 'dbname.myCollection' }]
      })*/
 }
-
-
-/*var black_number = new app.db.blaclist({
- ph:"SPAM_NUMBER",
- time: new Date().getTime()
- }).save(function(err, num){console.log(err, num)});*/
-/*app.db.blaclist.find(function (err, data) {
- console.log(data)
- });
- app.db.blaclist = mongoose.model('blacklist', new mongoose.Schema({
- ph: String,
- time: Number
- }));
- */

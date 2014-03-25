@@ -1,20 +1,22 @@
-var express = require("express");
 var util = require("util");
+var log = require("./log")(module);
 
 
-function UsernameError(message) {
+function UsernameFormatError(message) {
     this.message = message;
-    Error.captureStackTrace(this, UsernameError);
+    Error.captureStackTrace(this, UsernameFormatError);
 }
-util.inherits(UsernameError, Error);
-UsernameError.prototype.name = "UsernameError";
+util.inherits(UsernameFormatError, Error);
+UsernameFormatError.prototype.name = "UsernameFormatError";
 
-function PasswordError(message) {
+
+function PasswordFormatError(message) {
     this.message = message;
-    Error.captureStackTrace(this, PasswordError);
+    Error.captureStackTrace(this, PasswordFormatError);
 }
-util.inherits(PasswordError, Error);
-PasswordError.prototype.name = "PasswordError";
+util.inherits(PasswordFormatError, Error);
+PasswordFormatError.prototype.name = "PasswordFormatError";
+
 
 function HttpError(status, message) {
     this.status = status;
@@ -24,6 +26,7 @@ function HttpError(status, message) {
 util.inherits(HttpError, Error);
 HttpError.prototype.name = "HttpError";
 
+
 function DatabaseError(message) {
     this.message = message;
     Error.captureStackTrace(this, DatabaseError);
@@ -32,15 +35,48 @@ util.inherits(DatabaseError, Error);
 DatabaseError.prototype.name = "DatabaseError";
 
 
-ErrorRouter = express.Router();
+function DuplicateError(message) {
+    this.message = message;
+    Error.captureStackTrace(this, DuplicateError);
+}
+util.inherits(DuplicateError, Error);
+DuplicateError.prototype.name = "DuplicateError";
 
-ErrorRouter.use(function (err, req, res, next) {
+function PageNotFound(req, res, next) {
+    next(new HttpError(404));
+}
 
-});
+function ErrorHandler(err, req, res, next) {
+    switch(err.name){
+        case "UsernameFormatError":
+            res.json(406,{err:"UsernameFormatError"});
+            break;
+        case "PasswordFormatError":
+            res.json(406,{err:"PasswordFormatError"});
+            break;
+        case "DatabaseError":
+            res.send(500);
+            break;
+        case "HttpError":
+            res.send(404);
+            break;
+        case "DuplicateError":
+            res.send(406, {err: "DuplicateError"});
+            break;
+        case "SyntaxError":
+            res.send(406, {err:"Syntax error"});
+            break;
+        default:
+            res.send(500);
+            break;
+    }
+    log.error(err.stack);
+}
 
-
-module.exports.UsernameError = UsernameError;
-module.exports.PasswordError = PasswordError;
+module.exports.UsernameFormatError = UsernameFormatError;
+module.exports.PasswordFormatError = PasswordFormatError;
 module.exports.HttpError = HttpError;
 module.exports.DatabaseError = DatabaseError;
-module.exports.router = ErrorRouter;
+module.exports.DuplicateError = DuplicateError;
+module.exports.handler = ErrorHandler;
+module.exports.PageNotFound = PageNotFound;
