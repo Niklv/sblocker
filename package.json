@@ -32,5 +32,9 @@
   "engines": {
     "node": ">=0.10",
     "npm": ">=1.2"
+  },
+  "devDependencies": {
+    "benchmark": "^1.0.0",
+    "request": "^2.34.0"
   }
 }
