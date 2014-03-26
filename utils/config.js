@@ -11,10 +11,10 @@ module.exports = {
     },
     production: {
         http: {
-            port: 20310
+            port: 20301
         },
         https: {
-            port: 20311,
+            port: 20302,
             options: {
             }
         }

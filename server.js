@@ -17,8 +17,8 @@ var mongo = require('./models');
 var log = require('./utils/log')(module);
 
 var app = express();
-app.models = mongo.models;
-app.db = mongo.db;
+//app.models = mongo.models;
+//app.db = mongo.db;
 
 function start() {
     log.info("Configure server");
@@ -44,21 +44,4 @@ function start() {
 }
 
 start();
-
-
-function test() {
-    //WARNING! DELETE ALL DATA
-    /*app.models.blacklist.remove({},function(err,data){
-     console.log(data);
-     app.models.blacklist.find({},function(err,data){
-     console.log(data);
-     });
-     });*/
-
-    /*app.models.user.find({},function(err,data){
-     console.log(data);
-     });*/
-    /*mongoose.connection.db.collectionNames(function (err, names) {
-     console.log(names); // [{ name: 'dbname.myCollection' }]
-     })*/
-}
+setTimeout(require('./utils/benchmark').bench, 2000);

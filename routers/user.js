@@ -1,5 +1,6 @@
 var express = require("express");
 var validator = require("validator");
+var db = require("../models").db;
 var User = require("../models").models.user;
 var log = require("../utils/log")(module);
 var UsernameFormatError = require('../utils/errors').UsernameFormatError;
@@ -10,7 +11,7 @@ var DatabaseError = require('../utils/errors').DatabaseError;
 var user = express.Router();
 
 user.use('/', function (req, res, next) {
-    if (req.app.db.readyState)
+    if (db.readyState)
         next();
     else
         next(new DatabaseError("Not connected to db"));
@@ -41,24 +42,17 @@ user.post('/signup', function (req, res, next) {
             imei: imei,
             ph: ph
         });
-        User.find({$or: [
-            {username: u},
-            {email: e}
-        ]}, {_id:1}, { limit: 1 }, function (err, users) {
+        user.save(function (err, user) {
             if (err)
                 next(err);
-            else if (users)
-                next(new DuplicateError("User already exists"));
             else
-                user.save(function (err, user) {
-                    if (err)
-                        next(err);
-                    else
-                        res.send(200, {message: "Check your email"});
-                });
+                res.send(200, {message: "Check your email"});
         });
     }
 });
 
-
 exports.router = user;
+
+
+
+

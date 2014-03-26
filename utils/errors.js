@@ -1,4 +1,5 @@
 var util = require("util");
+var http = require("http");
 var log = require("./log")(module);
 
 
@@ -20,7 +21,7 @@ PasswordFormatError.prototype.name = "PasswordFormatError";
 
 function HttpError(status, message) {
     this.status = status;
-    this.message = message;
+    this.message = message || http.STATUS_CODES[status];
     Error.captureStackTrace(this, HttpError);
 }
 util.inherits(HttpError, Error);
@@ -47,6 +48,9 @@ function PageNotFound(req, res, next) {
 }
 
 function ErrorHandler(err, req, res, next) {
+    if(typeof err === 'number')
+        err = new HttpError(err);
+
     switch(err.name){
         case "UsernameFormatError":
             res.json(406,{err:"UsernameFormatError"});

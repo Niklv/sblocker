@@ -48,7 +48,7 @@ var user = new Schema({
 }).plugin(plugin.timestampsPlugin);
 
 user.methods.encryptPassword = function (password) {
-    return crypto.pbkdf2Sync(password, this.salt, 10000, 512);
+    return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
 };
 
 user.methods.checkPassword = function (password) {
@@ -61,7 +61,7 @@ user.virtual('userId').get(function () {
 
 user.virtual('password').set(function (password) {
     this._plainPassword = password;
-    this.salt = crypto.randomBytes(128).toString('base64');
+    this.salt = crypto.randomBytes(32).toString('base64');
     this.hashedPassword = this.encryptPassword(password);
 });
 
