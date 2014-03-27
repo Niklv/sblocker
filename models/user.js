@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
-var plugin = require('../utils/mongoose-plugins');
+var config = require('../utils/config');
 var Schema = mongoose.Schema;
 var Model = mongoose.model.bind(mongoose);
 
@@ -32,10 +32,14 @@ var user = new Schema({
     },
     ph: Array,
     imei: Array,
-    code: String,
+    tokens: Array,
     confirmed: {
         type: Boolean,
-        default: false
+        default: true
+    },
+    createAt: {
+        type: Date,
+        default: Date.now
     },
     is_banned: {
         type: Boolean,
@@ -45,7 +49,7 @@ var user = new Schema({
         type: Date,
         default: Date.now
     }
-}).plugin(plugin.timestampsPlugin);
+});
 
 user.methods.encryptPassword = function (password) {
     return crypto.createHmac('sha1', this.salt).update(password).digest('hex');
@@ -53,6 +57,15 @@ user.methods.encryptPassword = function (password) {
 
 user.methods.checkPassword = function (password) {
     return this.encryptPassword(password) === this.hashedPassword;
+};
+
+user.methods.generateToken = function(){
+    /*if(this.tokens)
+        this.tokens = [];
+    if(this.tokens.length>config.security.maxAllowedTokens)
+        this.tokens.shift();
+    */
+
 };
 
 user.virtual('userId').get(function () {
@@ -69,7 +82,12 @@ user.virtual('password').get(function () {
     return this._plainPassword;
 });
 
+user.static('login', function (){
+    console.log("LOGIN FUNCTION");
+});
+
 
 var User = Model('user', user);
+
 
 module.exports = {user: User};

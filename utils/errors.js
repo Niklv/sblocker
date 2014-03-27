@@ -65,7 +65,7 @@ function ErrorHandler(err, req, res, next) {
             res.send(404);
             break;
         case "DuplicateError":
-            res.send(406, {err: "DuplicateError"});
+            res.send(406, {err: "DuplicateError", message: err.message});
             break;
         case "SyntaxError":
             res.send(406, {err:"Syntax error"});

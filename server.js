@@ -17,8 +17,6 @@ var mongo = require('./models');
 var log = require('./utils/log')(module);
 
 var app = express();
-//app.models = mongo.models;
-//app.db = mongo.db;
 
 function start() {
     log.info("Configure server");

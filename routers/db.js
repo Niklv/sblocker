@@ -1,18 +1,8 @@
 var express = require("express");
 var models = require("../models").models;
-var mongo = require("../models").db;
 var DatabaseError = require("../utils/errors").DatabaseError;
 
 var db = express.Router();
-
-db.use(function (req, res, next) {
-    if (mongo.readyState)
-        next();
-    else
-        next(new DatabaseError("Not connected to db"));
-
-
-});
 
 db.get('/blacklist', function (req, res) {
     //TODO: cache and check for cache

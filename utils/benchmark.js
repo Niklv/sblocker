@@ -8,7 +8,7 @@ function test(cb) {
         uri: "http://localhost:20301/api/user/signup",
         method: 'POST',
         json: {
-            "u": "newuser@gmail.com", "p": "newpassword"
+            "u": "newuser7@gmail.com", "p": "newpassword"
         }
     };
     var user = new User({
@@ -17,7 +17,7 @@ function test(cb) {
         password: 'newpassword'
     });
     request(options, function (error, response, body) {
-        cb.resolve();
+        cb.resolve(error, response, body);
     });
 
 }
@@ -42,7 +42,9 @@ function bench() {
     );
     //suite.run();
     log.error("Benchmark started");
-    test({resolve: function () {console.log("done")}});
+    test({resolve: function (err, res) {
+        console.log(res.body)
+    }});
 }
 
 
