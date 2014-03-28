@@ -19,11 +19,10 @@ function test(cb) {
     request(options, function (error, response, body) {
         cb.resolve(error, response, body);
     });
-
 }
 
 
-function bench() {
+function bench_reg() {
     var suite = new Benchmark.Suite;
 
     var suit_opts = {
@@ -48,4 +47,9 @@ function bench() {
 }
 
 
-module.exports.bench = bench;
+function bench_token() {
+
+}
+
+
+module.exports.bench = bench_token;

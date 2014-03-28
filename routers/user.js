@@ -29,10 +29,13 @@ user.post('/signup', function (req, res, next) {
         imei = req.body.imei,
         ph = req.body.ph;
 
-    if (!validator.isEmail(e) || e.length < 6)
+    if (!validator.isEmail(e) || e.length < 6) {
         return next(new UsernameFormatError());
-    if (!(typeof p === "string") || p.length < 6)
+    }
+    if (!(typeof p === "string") || p.length < 6) {
         return next(new PasswordFormatError());
+    }
+
 
     async.waterfall([
         function (cb) {
@@ -42,8 +45,9 @@ user.post('/signup', function (req, res, next) {
             ]}, cb);
         },
         function (user, cb) {
-            if (user)
+            if (user) {
                 return cb(new DuplicateError("User " + u + " already exist"));
+            }
             new User({
                 username: u,
                 email: e,
@@ -55,28 +59,32 @@ user.post('/signup', function (req, res, next) {
         function (user, numberAffected, cb) {
             //TODO: generate auth link and send it user email
             cb(null, user);
+        },
+        function (user, cb) {
+            //TODO: generate and save token
+            cb(null, user);
         }
     ], function (err, user) {
-        if (err)
+        if (err) {
             return next(err);
+        }
         res.send(200, {message: "OK"});
     });
 
-/*
-    user.save(function (err, user) {
-        log.info(err.errors);
-        //log.info(err.name);
-        //log.info(err.number);
-        //log.info(err.stackTrace);
-        if (err)
-            next(err);
-        else
-            res.send(200, {message: "OK"});
-    });
-*/
+    /*
+     user.save(function (err, user) {
+     log.info(err.errors);
+     //log.info(err.name);
+     //log.info(err.number);
+     //log.info(err.stackTrace);
+     if (err)
+     next(err);
+     else
+     res.send(200, {message: "OK"});
+     });
+     */
 
-})
-;
+});
 
 exports.router = user;
 

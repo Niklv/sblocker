@@ -1,6 +1,8 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
 var config = require('../utils/config');
+var DatabaseError = require('../utils/errors').DatabaseError;
+var Token = require('./token').token;
 var Schema = mongoose.Schema;
 var Model = mongoose.model.bind(mongoose);
 
@@ -32,7 +34,6 @@ var user = new Schema({
     },
     ph: Array,
     imei: Array,
-    tokens: Array,
     confirmed: {
         type: Boolean,
         default: true
@@ -59,12 +60,21 @@ user.methods.checkPassword = function (password) {
     return this.encryptPassword(password) === this.hashedPassword;
 };
 
-user.methods.generateToken = function(){
-    /*if(this.tokens)
-        this.tokens = [];
-    if(this.tokens.length>config.security.maxAllowedTokens)
-        this.tokens.shift();
-    */
+user.methods.generateToken = function (cb) {
+    user = this;
+    Token.find({user: user._id}, function (err, tokens) {
+        if (err)
+            return cb(new DatabaseError());
+        if (tokens && (tokens.length >= config.security.maxAllowedTokens))
+            tokens.shift(); //find first token and delete
+        //create token
+        new Token({
+            user: user._id,
+            ttl: 3600
+        }).save(function (err, token) {
+
+            });
+    });
 
 };
 
@@ -82,7 +92,7 @@ user.virtual('password').get(function () {
     return this._plainPassword;
 });
 
-user.static('login', function (){
+user.static('login', function () {
     console.log("LOGIN FUNCTION");
 });
 
