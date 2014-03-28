@@ -29,7 +29,7 @@ user.post('/signup', function (req, res, next) {
         imei = req.body.imei,
         ph = req.body.ph;
 
-    if (!validator.isEmail(e) || e.length < 6) {
+    if (!(typeof e === "string") || !validator.isEmail(e) || e.length < 6 || e.length > 60) {
         return next(new UsernameFormatError());
     }
     if (!(typeof p === "string") || p.length < 6) {

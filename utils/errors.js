@@ -48,15 +48,15 @@ function PageNotFound(req, res, next) {
 }
 
 function ErrorHandler(err, req, res, next) {
-    if(typeof err === 'number')
+    if (typeof err === 'number')
         err = new HttpError(err);
 
-    switch(err.name){
+    switch (err.name) {
         case "UsernameFormatError":
-            res.json(406,{err:"UsernameFormatError"});
+            res.json(406, {err: "UsernameFormatError"});
             break;
         case "PasswordFormatError":
-            res.json(406,{err:"PasswordFormatError"});
+            res.json(406, {err: "PasswordFormatError"});
             break;
         case "DatabaseError":
             res.send(500);
@@ -68,7 +68,7 @@ function ErrorHandler(err, req, res, next) {
             res.send(406, {err: "DuplicateError", message: err.message});
             break;
         case "SyntaxError":
-            res.send(406, {err:"Syntax error"});
+            res.send(406, {err: "Syntax error"});
             break;
         default:
             res.send(500);
