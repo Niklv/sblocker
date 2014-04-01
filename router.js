@@ -1,4 +1,3 @@
-var utils = require('./utils/utils');
 var config = require('./utils/config');
 var error = require('./utils/errors');
 var async = require('async');
