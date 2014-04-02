@@ -32,7 +32,7 @@ user.post('/signup', function (req, res, next) {
     if (!(typeof e === "string") || !validator.isEmail(e) || e.length < 6 || e.length > 60) {
         return next(new UsernameFormatError());
     }
-    if (!(typeof p === "string") || p.length < 6) {
+    if (!(typeof p === "string") || p.length < 6 || p.length > 60) {
         return next(new PasswordFormatError());
     }
 

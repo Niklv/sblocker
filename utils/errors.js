@@ -74,7 +74,7 @@ function ErrorHandler(err, req, res, next) {
             res.send(500);
             break;
     }
-    log.error(err.stack);
+    //log.error(err.stack);
 }
 
 module.exports.UsernameFormatError = UsernameFormatError;

@@ -3,6 +3,8 @@ var chai = require('chai');
 var should = chai.should();
 var expect = chai.expect;
 var server = require("../server").app;
+var models = require("../models").models;
+var db = require("../models").db;
 //app.listen(3000, function(){});
 var request = require('supertest');
 var app = request(server);
@@ -11,137 +13,131 @@ var async = require("async");
 chai.config.includeStack = true;
 
 /**/
+describe('Initial DB routines', function () {
+    before(function (done) {
+        db.on('connected', done);
+    });
+
+    it('Should connect to MongoDB', function (done) {
+        db.readyState === 1 ? done() : done(false);
+    });
+});
+
 
 describe('Api', function () {
     describe('User', function () {
         describe('#signup', function () {
-            it("sould return 500 when not valid json", function (done) {
-                app.post('/api/user/signup').type('json').send("nojson").expect(500, done);
-            });
-            it("sould return 406 when username not set", function (done) {
-                app.post('/api/user/signup').type('json').send({"p": "newpassword"}).expect(406, done);
-            });
-            it("sould return 406 when username not valid", function (done) {
-                async.series([
-                    function (cb) {
-                        app.post('/api/user/signup').type('json').send({"u": "            ", "p": "newpassword"}).expect(406, cb);
-                    },
-                    function (cb) {
-                        app.post('/api/user/signup').type('json').send({"u": "", "p": "newpassword"}).expect(406, cb);
-                    },
-                    function (cb) {
-                        app.post('/api/user/signup').type('json').send({"u": 41364591424471235, "p": "newpassword"}).expect(406, cb);
-                    },
-                    function (cb) {
-                        app.post('/api/user/signup').type('json').send({"u": /gaeaeagga/, "p": "newpassword"}).expect(406, cb);
-                    },
-                    function (cb) {
-                        app.post('/api/user/signup').type('json').send({"u": "        @     .    ", "p": "newpassword"}).expect(406, cb);
-                    },
-                    function (cb) {
-                        app.post('/api/user/signup').type('json').send({"u": "fsrguhsw4itg3wgy93wgy3y83g54y93wg973gy7wy793wgy793gy@gddxndndfndfnhehe.ru", "p": "newpassword"}).expect(406, cb);
-                    },
-                    function (cb) {
-                        app.post('/api/user/signup').type('json').send({"u": "r@T.r", "p": "newpassword"}).expect(406, cb);
-                    }
-                ], function (err) {
-                    done(err);
+            describe('bad_data', function () {
+                it("sould return 500 when not valid json", function (done) {
+                    app.post('/api/user/signup').type('json').send("nojson").expect(500, done);
+                });
+                it("sould return 406 when username not set", function (done) {
+                    app.post('/api/user/signup').type('json').send({"p": "newpassword"}).expect(406, done);
                 });
                 it("sould return 406 when password not set", function (done) {
                     app.post('/api/user/signup').type('json').send({"u": "username@mail.com"}).expect(406, done);
                 });
-
-
+                it("sould return 406 when username not valid", function (done) {
+                    async.series([
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "            ", "p": "newpassword"}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "", "p": "newpassword"}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": 41364591424471235, "p": "newpassword"}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": /gaeaeagga/, "p": "newpassword"}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "        @     .    ", "p": "newpassword"}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "fsrguhsw4itg3wgy93wgy3y83g54y93wg973gy7wy793wgy793gy@gddxndndfndfnhehe.ru", "p": "newpassword"}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "r@T.r", "p": "newpassword"}).expect(406, cb);
+                        }
+                    ], function (err) {
+                        done(err);
+                    });
+                });
+                it("sould return 406 when passowrd not valid", function (done) {
+                    async.series([
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": ""}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": 16361361346431343}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": /newpassword/}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": "gszurgidgbxdrbgrbgibsdigbdigbdirgbidrbgdruibgiudgbrgibdiurgbdirgbidubgiubdribgidubrgidbrguidrb"}).expect(406, cb);
+                        },
+                        function (cb) {
+                            app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": "new"}).expect(406, cb);
+                        }
+                    ], function (err) {
+                        done(err);
+                    });
+                });
+            });
+            describe('good_data', function () {
+                function clear_user(done) {
+                    models.user.findOne({username: "username@mail.com"}, function (err, user) {
+                        if (err) {
+                            return done(err);
+                        }
+                        if (user) {
+                            user.remove(done);
+                        }
+                    });
+                }
+                before(clear_user);
+                it("sould return 200 and token when all is ok", function (done) {
+                    app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": "password"}).expect(200,
+                        function (err, res) {
+                            res.body.should.have.property('message').be.equal('OK');
+                            //res.body.should.have.property('token').be.a('string');
+                            done(err);
+                        });
+                });
+                it("sould return 200 and token when user already exist", function (done) {
+                    app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": "password"}).expect(406,
+                        function (err, res) {
+                            console.log(res.body.message);
+                            res.body.should.have.property('err').be.equal('DuplicateError');
+                            res.body.should.have.property('message').be.equal('User username@mail.com already exist');
+                            done(err);
+                        });
+                });
+                after(clear_user);
             });
         });
-
-        /*describe('Signup', function () {
-
-         it('should return HTTP406 and error when username not valid', function (done) {
-         async.series(
-         [
-         function (cb) {
-         request("http://localhost:20301/api/user/signup", {
-         method: 'POST',
-         json: {
-         "p": "newpassword"
-         }
-         }, function (err, res) {
-         res.statusCode.should.be.equal(406);
-         res.body.should.have.property('err').be.equal('UsernameFormatError');
-         cb(err);
-         });
-         },
-         function (cb) {
-         request("http://localhost:20301/api/user/signup", {
-         method: 'POST',
-         json: {
-         "u": "TestUserTestMail.com",
-         "p": "newpassword"
-         }
-         }, function (err, res) {
-         res.statusCode.should.be.equal(406);
-         res.body.should.have.property('err').be.equal('UsernameFormatError');
-         cb(err);
-         });
-         },
-         function (cb) {
-         request("http://localhost:20301/api/user/signup", {
-         method: 'POST',
-         json: {
-         "u": "t",
-         "p": "newpassword"
-         }
-         }, function (err, res) {
-         res.statusCode.should.be.equal(406);
-         res.body.should.have.property('err').be.equal('UsernameFormatError');
-         cb(err);
-         });
-         },
-         function (cb) {
-         request("http://localhost:20301/api/user/signup", {
-         method: 'POST',
-         json: {
-         "u": "osyc5316hrhdrhhdjrjdbrjsbsrbsrjvsjdhvjhvlj146ashvjsvlsvljvshveljv@lszrbbzrblkbgzjkbrgzbrbkzzr136643.gszgrbslegvlse",
-         "p": "newpassword"
-         }
-         }, function (err, res) {
-         res.statusCode.should.be.equal(406);
-         res.body.should.have.property('err').be.equal('UsernameFormatError');
-         cb(err);
-         });
-         }
-         ],
-         function (err) {
-         done(err);
-         }
-         );
-         });
-         it('should return HTTP400 and message when password not valid', function (done) {
-         done();
-         });
-         it('should return HTTP201, message and token when username and password is ok', function (done) {
-         done();
-         });
-         it('should return HTTP409, message and token when username and password is ok and already exist in DB', function (done) {
-         done();
-         });
-         it('should return HTTP409, message and token when username and password is ok and already exist in DB', function (done) {
-         done();
-         });
-         });*/
-    });
-    describe('Db', function () {
-
     });
 
-    it('should return HTTP500 when DB not work', function (done) {
-        done();
-    });
     it('should return HTTP404 when wrong page', function (done) {
         done();
     });
 });
+
+/*describe('Db', function () {
+    before(function (done) {
+        //require('mongoose').disconnect();
+        //db.on('close', done);
+        done();
+    });
+    it('Should disconnected from MongoDB', function (done) {
+        db.readyState === 1 ? done(false) : done();
+    });
+    it('should return HTTP500 when DB not work', function (done) {
+        done();
+    });
+});*/
 
 
 /*request(options, function (error, response, body) {

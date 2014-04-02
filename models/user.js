@@ -71,9 +71,11 @@ user.methods.generateToken = function (cb) {
         new Token({
             user: user._id,
             ttl: 3600
-        }).save(function (err, token) {
+        }).save(
+            function (err, token) {
 
-            });
+            }
+        );
     });
 
 };
