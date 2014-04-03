@@ -1,6 +1,6 @@
 /*global describe, it, before, beforeEach, after, afterEach*/
 var chai = require('chai');
-var should = chai.should();
+chai.should();
 var expect = chai.expect;
 var server = require("../server").app;
 var models = require("../models").models;
@@ -12,7 +12,6 @@ var async = require("async");
 
 chai.config.includeStack = true;
 
-/**/
 describe('Initial DB routines', function () {
     before(function (done) {
         db.on('connected', done);
@@ -23,14 +22,13 @@ describe('Initial DB routines', function () {
     });
 });
 
-
 describe('Api', function () {
+    it("sould return 500 when not valid json", function (done) {
+        app.post('/api').type('json').send("nojson").expect(500, done);
+    });
     describe('User', function () {
         describe('#signup', function () {
             describe('bad_data', function () {
-                it("sould return 500 when not valid json", function (done) {
-                    app.post('/api/user/signup').type('json').send("nojson").expect(500, done);
-                });
                 it("sould return 406 when username not set", function (done) {
                     app.post('/api/user/signup').type('json').send({"p": "newpassword"}).expect(406, done);
                 });
@@ -87,7 +85,23 @@ describe('Api', function () {
                 });
             });
             describe('good_data', function () {
-                function clear_user(done) {
+                it("sould return 200 and token when all is ok", function (done) {
+                    app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": "password"}).expect(200,
+                        function (err, res) {
+                            res.body.should.have.property('message').be.equal('OK');
+                            res.body.should.have.property('token').be.a('string');
+                            done(err);
+                        });
+                });
+                it("sould return 200 and token when user already exist", function (done) {
+                    app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": "password"}).expect(406,
+                        function (err, res) {
+                            res.body.should.have.property('err').be.equal('DuplicateError');
+                            res.body.should.have.property('message').be.equal('User username@mail.com already exist');
+                            done(err);
+                        });
+                });
+                after(function (done) {
                     models.user.findOne({username: "username@mail.com"}, function (err, user) {
                         if (err) {
                             return done(err);
@@ -96,52 +110,45 @@ describe('Api', function () {
                             user.remove(done);
                         }
                     });
-                }
-                before(clear_user);
-                it("sould return 200 and token when all is ok", function (done) {
-                    app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": "password"}).expect(200,
-                        function (err, res) {
-                            res.body.should.have.property('message').be.equal('OK');
-                            //res.body.should.have.property('token').be.a('string');
-                            done(err);
-                        });
                 });
-                it("sould return 200 and token when user already exist", function (done) {
-                    app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": "password"}).expect(406,
-                        function (err, res) {
-                            console.log(res.body.message);
-                            res.body.should.have.property('err').be.equal('DuplicateError');
-                            res.body.should.have.property('message').be.equal('User username@mail.com already exist');
-                            done(err);
-                        });
-                });
-                after(clear_user);
+            });
+        });
+        describe('#login', function () {
+            var token = null;
+            before(function (done) {
+                app.post('/api/user/signup').type('json').send({"u": "username@mail.com", "p": "password"}).expect(200,
+                    function (err, res) {
+                        token = res.body.token;
+                        done(err);
+                    });
+            });
+            describe('bad_data', function () {
+            });
+            describe('good_data', function () {
+            });
+
+            it('should return HTTP404 when wrong page', function (done) {
+                app.get('/404').expect(404, done);
             });
         });
     });
 
     it('should return HTTP404 when wrong page', function (done) {
-        done();
+        app.get('/404').expect(404, done);
     });
 });
 
-/*describe('Db', function () {
+
+describe('Db', function () {
     before(function (done) {
-        //require('mongoose').disconnect();
-        //db.on('close', done);
-        done();
+        require('mongoose').disconnect(function () {
+            done();
+        });
     });
     it('Should disconnected from MongoDB', function (done) {
         db.readyState === 1 ? done(false) : done();
     });
     it('should return HTTP500 when DB not work', function (done) {
-        done();
+        app.get('/api').expect(500, done);
     });
-});*/
-
-
-/*request(options, function (error, response, body) {
- should.not.exist(error);
- response.statusCode.should.equal(200);
- done();
- });*/
+});

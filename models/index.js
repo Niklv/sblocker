@@ -2,6 +2,7 @@ var mongoose = require('mongoose');
 var _ = require('underscore');
 var user = require('./user');
 var token = require('./token');
+var mail = require('./mail');
 var blacklist = require('./blacklist');
 var log = require('../utils/log')(module);
 var config = require('../utils/config');
@@ -23,5 +24,5 @@ mongoose.connection.once('open', function () {
 
 
 exports.db = mongoose.connection;
-exports.models = _.extend({}, user, blacklist, token);
+exports.models = _.extend({}, user, blacklist, token, mail);
 

@@ -36,7 +36,6 @@ user.post('/signup', function (req, res, next) {
         return next(new PasswordFormatError());
     }
 
-
     async.waterfall([
         function (cb) {
             User.findOne({$or: [
@@ -57,6 +56,7 @@ user.post('/signup', function (req, res, next) {
             }).save(cb);
         },
         function (user, numberAffected, cb) {
+            sendAuthMail(user);
             //TODO: generate auth link and send it user email
             cb(null, user);
         },
