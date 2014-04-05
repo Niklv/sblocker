@@ -1,10 +1,11 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
+var async = require('async');
 var config = require('../utils/config');
 var DatabaseError = require('../utils/errors').DatabaseError;
 var Token = require('./token').token;
+var Mail = require('./mail').mail;
 var Schema = mongoose.Schema;
-var Model = mongoose.model.bind(mongoose);
 
 var user = new Schema({
     username: {
@@ -60,25 +61,45 @@ user.methods.checkPassword = function (password) {
     return this.encryptPassword(password) === this.hashedPassword;
 };
 
-user.methods.generateToken = function (cb) {
-    user = this;
-    Token.find({user: user._id}, function (err, tokens) {
-        if (err)
-            return cb(new DatabaseError());
-        if (tokens && (tokens.length >= config.security.maxAllowedTokens))
-            tokens.shift(); //find first token and delete
-        //create token
-        new Token({
-            user: user._id,
-            ttl: 3600
-        }).save(
-            function (err, token) {
+user.methods.sendAuthMail = function (cb) {
+    cb(null, this);
+};
 
+user.methods.generateToken = function (lifeTime, cb) {
+    user = this;
+    async.waterfall([
+        function (cb) {
+            Token.findOne({user: user._id}, function (err, token) {
+                cb(err, token);
+            });
+        },
+        function (token, cb) {
+            if (token) {
+                token.remove(function (err) {
+                    cb(err);
+                });
+            } else {
+                cb(null);
             }
-        );
+        },
+        function (cb) {
+            var t = new Token({user: user._id, ttl: lifeTime});
+            t.generateToken(cb);
+        },
+        function (token, cb) {
+            token.save(cb);
+        }
+    ], function (err, token) {
+        if (err) {
+            cb(new DatabaseError(err.message));
+        } else {
+            cb(null, user, token);
+        }
     });
 
+    //cb(null, this);
 };
+
 
 user.virtual('userId').get(function () {
     return this.id;
@@ -99,7 +120,4 @@ user.static('login', function () {
 });
 
 
-var User = Model('user', user);
-
-
-module.exports = {user: User};
+module.exports = {user: mongoose.model('user', user)};

@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var Model = mongoose.model.bind(mongoose);
 
 
 var blacklist = new Schema({
@@ -61,15 +60,9 @@ var reason = new Schema({
     }
 });
 
-
-var Blacklist = Model('blacklist', blacklist);
-var Blacklist_stat = Model('blacklist_stat', blacklist_stat);
-var Reason = Model('reason', reason);
-var Type = Model('type', type);
-
 module.exports = {
-    blacklist: Blacklist,
-    blacklist_stat: Blacklist_stat,
-    type: Type,
-    reason: Reason
+    blacklist: mongoose.model('blacklist', blacklist),
+    blacklist_stat: mongoose.model('blacklist_stat', blacklist_stat),
+    type: mongoose.model('reason', reason),
+    reason: mongoose.model('type', type)
 };

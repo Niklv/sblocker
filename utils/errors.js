@@ -18,6 +18,12 @@ function PasswordFormatError(message) {
 util.inherits(PasswordFormatError, Error);
 PasswordFormatError.prototype.name = "PasswordFormatError";
 
+function SidFormatError(message) {
+    this.message = message;
+    Error.captureStackTrace(this, SidFormatError);
+}
+util.inherits(SidFormatError, Error);
+SidFormatError.prototype.name = "SidFormatError";
 
 function HttpError(status, message) {
     this.status = status;
@@ -58,14 +64,17 @@ function ErrorHandler(err, req, res, next) {
         case "PasswordFormatError":
             res.json(406, {err: "PasswordFormatError"});
             break;
+        case "SidFormatError":
+            res.send(403);
+            break;
         case "DatabaseError":
             res.send(500);
             break;
         case "HttpError":
-            res.send(404);
+            res.send(err.status);
             break;
         case "DuplicateError":
-            res.send(406, {err: "DuplicateError", message: err.message});
+            res.send(409, {err: "DuplicateError", message: err.message});
             break;
         case "SyntaxError":
             res.send(406, {err: "Syntax error"});
@@ -79,6 +88,7 @@ function ErrorHandler(err, req, res, next) {
 
 module.exports.UsernameFormatError = UsernameFormatError;
 module.exports.PasswordFormatError = PasswordFormatError;
+module.exports.SidFormatError = SidFormatError;
 module.exports.HttpError = HttpError;
 module.exports.DatabaseError = DatabaseError;
 module.exports.DuplicateError = DuplicateError;

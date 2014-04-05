@@ -3,7 +3,6 @@ var crypto = require('crypto');
 var config = require('../utils/config');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
-var Model = mongoose.model.bind(mongoose);
 
 
 var token = new Schema({
@@ -12,17 +11,30 @@ var token = new Schema({
         ref: 'user',
         index: true
     },
-    token:{
+    token: {
         type: String
+    },
+    ttl: {
+        type: Number,
+        require: true
     },
     createdAt: {
         type: Date,
-        dafault: Date.now,
-        expired: config.security.tokenLife
+        dafault: Date.now
     }
 });
 
-var Token = Model('token', token);
+token.methods.generateToken = function (cb) {
+    var self = this;
+    crypto.randomBytes(config.security.tokenLength, function (ex, buf) {
+        self.token = buf.toString('hex');
+        cb(null, self);
+    });
+};
+
+token.statics.sid = function (str) {
+    return crypto.createHash('md5').update(str).digest('hex');
+};
 
 
-module.exports = {token: Token};
+module.exports = {token: mongoose.model('token', token)};

@@ -20,7 +20,9 @@ module.exports = {
         }
     },
     security: {
-        tokenLife: 60*60*24*365, //one year
+        tokenLength: 48, //bytes
+        standartTokenLife: 60 * 60 * 24 * 365, //one year
+        registrationTokenLife: 60 * 60 * 24, //one day
         maxAllowedTokens: 3
     },
     mongo: {
