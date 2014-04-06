@@ -41,7 +41,7 @@ user.post('/login', function (req, res, next) {
             }
         },
         function (user, cb) {
-            user.generateToken(config.security.standartTokenLife, cb);
+            user.generateToken(cb);
         }
     ], function (err, user, token) {
         if (err === 401) {
@@ -92,7 +92,7 @@ user.post('/signup', function (req, res, next) {
             user.sendAuthMail(cb);
         },
         function (user, cb) {
-            user.generateToken(config.security.standartTokenLife, cb);
+            user.generateToken(cb);
         }
     ], function (err, user, token) {
         if (err) {

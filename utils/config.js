@@ -21,9 +21,7 @@ module.exports = {
     },
     security: {
         tokenLength: 48, //bytes
-        standartTokenLife: 60 * 60 * 24 * 365, //one year
-        registrationTokenLife: 60 * 60 * 24, //one day
-        maxAllowedTokens: 3
+        token_ttl: 60 * 60 * 24 * 365 //one year
     },
     mongo: {
         user: "developer",

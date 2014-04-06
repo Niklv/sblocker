@@ -14,13 +14,10 @@ var token = new Schema({
     token: {
         type: String
     },
-    ttl: {
-        type: Number,
-        require: true
-    },
     createdAt: {
         type: Date,
-        dafault: Date.now
+        dafault: Date.now,
+        index: {require: true, expires: config.security.token_ttl }
     }
 });
 

@@ -1,7 +1,6 @@
 var mongoose = require('mongoose');
 var crypto = require('crypto');
 var async = require('async');
-var config = require('../utils/config');
 var DatabaseError = require('../utils/errors').DatabaseError;
 var Token = require('./token').token;
 var Mail = require('./mail').mail;
@@ -65,7 +64,7 @@ user.methods.sendAuthMail = function (cb) {
     cb(null, this);
 };
 
-user.methods.generateToken = function (lifeTime, cb) {
+user.methods.generateToken = function (cb) {
     user = this;
     async.waterfall([
         function (cb) {
@@ -83,7 +82,7 @@ user.methods.generateToken = function (lifeTime, cb) {
             }
         },
         function (cb) {
-            var t = new Token({user: user._id, ttl: lifeTime});
+            var t = new Token({user: user._id, createdAt: new Date()});
             t.generateToken(cb);
         },
         function (token, cb) {
@@ -96,8 +95,6 @@ user.methods.generateToken = function (lifeTime, cb) {
             cb(null, user, token);
         }
     });
-
-    //cb(null, this);
 };
 
 
@@ -114,10 +111,5 @@ user.virtual('password').set(function (password) {
 user.virtual('password').get(function () {
     return this._plainPassword;
 });
-
-user.static('login', function () {
-    console.log("LOGIN FUNCTION");
-});
-
 
 module.exports = {user: mongoose.model('user', user)};
