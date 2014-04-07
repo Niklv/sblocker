@@ -105,14 +105,14 @@ user.post('/signup', function (req, res, next) {
 user.param('user', function (req, res, next, username) {
     User.findOne({username: username}, function (err, user) {
         if (err) {
-            return next(new DatabaseError());
+            return next(new DatabaseError(err));
         }
         if (!user) {
             return next(403);
         }
         Token.findOne({user: user._id}, function (err, token) {
             if (err) {
-                return next(new DatabaseError());
+                return next(new DatabaseError(err));
             }
             if (!token) {
                 return next(403);
@@ -140,9 +140,9 @@ user.post('/:user/logout', function (req, res, next) {
     if (server_sid !== sid) {
         next(403);
     } else {
-        req.user_token.remove(function(err){
-            if(err){
-                return new DatabaseError();
+        req.user_token.remove(function (err) {
+            if (err) {
+                return new DatabaseError(err);
             }
             res.send(200);
         });
