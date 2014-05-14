@@ -25,12 +25,8 @@ function start() {
 
 start();
 
+var httpPort = config.http.port;
+http.createServer(app).listen(httpPort).on('listening', function () {
+    log.info("Http bound to " + httpPort + " port");
+});
 
-if (module.parent) {
-    module.exports.app = app;
-} else {
-    var httpPort = config.http.port;
-    http.createServer(app).listen(httpPort).on('listening', function () {
-        log.info("Http bound to " + httpPort + " port");
-    });
-}
