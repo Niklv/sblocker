@@ -1,4 +1,35 @@
 {
-    "name": "application-name",
-    "version": "0.0.1"
+  "name": "sblocker-server",
+  "version": "0.0.1",
+  "author": [
+    "Lvov Nikita <niklvov@gmail.com>"
+  ],
+  "description": "SBlocker server",
+  "contributors": [
+    {
+      "name": "Lvov Nikita",
+      "email": "niklvov@gmail.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Niklv/sblocker.git"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.2.0",
+    "underscore": "^1.6.0",
+    "async": "^0.8.0",
+    "winston": "^0.7.3",
+    "body-parser": "^1.2.0",
+    "compression": "^1.0.2",
+    "morgan": "^1.0.1",
+    "method-override": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=0.10",
+    "npm": ">=1.4"
+  }
 }
