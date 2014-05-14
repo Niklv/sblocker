@@ -26,7 +26,5 @@ function start() {
 start();
 
 var httpPort = config.http.port;
-http.createServer(app).listen(httpPort).on('listening', function () {
-    log.info("Http bound to " + httpPort + " port");
-});
+app.listen(httpPort);
 
