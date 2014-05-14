@@ -1,3 +1,4 @@
+/*jslint white:true*/
 var util = require("util");
 var http = require("http");
 var log = require("./log")(module);
@@ -34,8 +35,8 @@ util.inherits(HttpError, Error);
 HttpError.prototype.name = "HttpError";
 
 
-function DatabaseError(message) {
-    this.message = message;
+function DatabaseError(err) {
+    this.message = err;
     Error.captureStackTrace(this, DatabaseError);
 }
 util.inherits(DatabaseError, Error);
@@ -54,8 +55,9 @@ function PageNotFound(req, res, next) {
 }
 
 function ErrorHandler(err, req, res, next) {
-    if (typeof err === 'number')
+    if (typeof err === 'number') {
         err = new HttpError(err);
+    }
 
     switch (err.name) {
         case "UsernameFormatError":
@@ -67,7 +69,10 @@ function ErrorHandler(err, req, res, next) {
         case "SidFormatError":
             res.send(403);
             break;
+        case "MongoError":
         case "DatabaseError":
+            log.error(err.name);
+            log.error(err.stack);
             res.send(500);
             break;
         case "HttpError":
@@ -76,14 +81,19 @@ function ErrorHandler(err, req, res, next) {
         case "DuplicateError":
             res.send(409, {err: "DuplicateError", message: err.message});
             break;
-        case "SyntaxError":
-            res.send(406, {err: "Syntax error"});
-            break;
         default:
-            res.send(500);
+            switch (err.message) {
+                case 'invalid json':
+                    res.send(500);
+                    break;
+                default:
+                    res.send(500);
+                    log.error('Undefined error!', err.name, err.message);
+                    log.error(err.stack);
+                    break;
+            }
             break;
     }
-    //log.error(err.stack);
 }
 
 module.exports.UsernameFormatError = UsernameFormatError;
