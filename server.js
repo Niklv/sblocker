@@ -3,6 +3,7 @@ var express = require('express');
 var http = require('http');
 var config = require('./config');
 var log = require('./utils/log')(module);
+var error = require('./utils/error');
 
 var app = express();
 
@@ -15,11 +16,11 @@ function start() {
     app.use(require('body-parser')());
     app.use(require('method-override')());
     app.use('/api', require('./routers/api').router);
-    app.use('/', function (req, res) {
+    app.get('/', function (req, res) {
         res.json({status: 'server is running'});
     });
-    //app.use(error.PageNotFound);
-    //app.use(error.handler);
+    app.use(error.PageNotFound);
+    app.use(error.handler);
     log.info("Server config complete!");
 }
 
@@ -27,4 +28,5 @@ start();
 
 var httpPort = config.http.port;
 app.listen(httpPort);
+log.info("Server start at " + httpPort);
 
