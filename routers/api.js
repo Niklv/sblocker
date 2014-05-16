@@ -1,7 +1,16 @@
 var express = require("express");
 
 var api = express.Router();
-api.use(function (req, res, next) {
+
+
+function verifyToken(token) {
+
+}
+
+
+api.use('', function (req, res, next) {
+    if(req.body)
+        log.info(req.body);
     //TODO: JSON WEB TOKEN VALIDATION
     //TODO: FIND USER
     //TODO: IF NEW THEN ADD TO DB NEW USER
