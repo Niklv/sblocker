@@ -29,7 +29,8 @@
     "method-override": "^1.0.1",
     "sqlite3": "^2.2.3",
     "jwt-simple": "^0.2.0",
-    "mongoose": "^3.8.10"
+    "mongoose": "^3.8.10",
+    "cron": "^1.0.4"
   },
   "engines": {
     "node": ">=0.10",
