@@ -44,4 +44,5 @@ start();
 var httpPort = config.http.port;
 app.listen(httpPort);
 log.info("Server start at " + httpPort);
+require('./controllers/clientdb')();
 
