@@ -28,7 +28,8 @@
     "morgan": "^1.0.1",
     "method-override": "^1.0.0",
     "sqlite3": "^2.2.3",
-    "jwt-simple": "^0.2.0"
+    "jwt-simple": "^0.2.0",
+    "cron": "^1.0.4"
   },
   "engines": {
     "node": ">=0.10",
