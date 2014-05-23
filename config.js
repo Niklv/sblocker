@@ -12,6 +12,12 @@ module.exports = {
         google_cert: "https://www.googleapis.com/oauth2/v1/certs",
         aud: "",
         azp: "81527757855-pa29mpjfectmnhlp8vft7o4ktv8a1uge.apps.googleusercontent.com"
-    }
+    },
+    clientdb: {
+        name: "client.sqlite3"
+    },
+    data_path: "content/data/",
+    temp_postfix: ".temp",
+    gzip_postfix: ".gz"
 };
 
