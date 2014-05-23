@@ -1,3 +1,4 @@
 .idea/
 node_modules/sqlite3/
 content/data/client.sqlite3
+content/data/client.sqlite3.gz
