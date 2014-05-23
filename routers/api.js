@@ -1,4 +1,7 @@
 var express = require("express");
+var fs = require("fs");
+var path = require("path");
+var config = require("../config");
 var ServerError = require("../utils/error").ServerError;
 var log = require('../utils/log')(module);
 
@@ -20,7 +23,7 @@ api.use(function (req, res, next) {
     if (params.version != 1)
         return next(new ServerError("Wrong API version", 1001, 400));
     if (!params.token)
-        return next(new ServerError("Token must be set", 1002, 400));
+        return next(new ServerError("Token must be set", 1002, 403));
 
 
     //TODO: JSON WEB TOKEN VALIDATION
@@ -30,9 +33,23 @@ api.use(function (req, res, next) {
     next();
 });
 
-api.get('/phone_db', function (req, res) {
-    //TODO: GET PHONES DB
-    res.json(200, {status: 'In progress'});
+api.get('/phone_db', function (req, res, next) {
+    var dbpath = path.resolve(__dirname + '/../'
+        + config.data_path + config.clientdb.name + config.gzip_postfix);
+    fs.exists(dbpath, function (exists) {
+        if (exists) {
+            res.setHeader('Status Code', 200);
+            res.setHeader('Content-Type', 'application/x-sqlite3');
+            res.setHeader('Content-Encoding', 'gzip');
+            res.sendfile(dbpath, {}, function (err) {
+                if (err) {
+                    log.error(err);
+                    res.end();
+                }
+            });
+        } else
+            next(new ServerError("File serving error", 1004, 500));
+    });
 });
 
 api.post('change_phone', function (req, res) {
