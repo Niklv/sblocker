@@ -11,7 +11,7 @@ function getLogger(module) {
                 timestamp: function () {
                     return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
                 },
-                level: ENV == 'development' ? 'debug' : 'info',
+                level: ENV == 'production' ? 'info' : 'debug',
                 label: path
             })
         ]
