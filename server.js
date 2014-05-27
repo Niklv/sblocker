@@ -44,7 +44,8 @@ start();
 var httpPort = config.http.port;
 app.listen(httpPort);
 log.info("Server start at " + httpPort);
-require('./controllers/token').updateCertificates();
-require('./controllers/clientdb')();
+//require('./controllers/token').updateCertificates();
+//require('./controllers/clientdb')();
+app.cronJobs = require('./controllers/cron').setup();
 
 

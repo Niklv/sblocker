@@ -1,6 +1,5 @@
 var fs = require('fs');
 var zlib = require('zlib');
-var cron = require('cron');
 var models = require('../models');
 var async = require('async');
 var sqlite3 = require('sqlite3').verbose();
@@ -130,4 +129,4 @@ function fillClientSliteDb(sqlitedb, mongooseModel, tableName, cb) {
 }
 
 
-module.exports = create;
+module.exports.create = create;
