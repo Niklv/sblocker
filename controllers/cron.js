@@ -6,7 +6,7 @@ var log = require('../utils/log')(module);
 
 
 function getTokenCronJob() {
-    return new CronJob('* */15 * * * *', function () {
+    return new CronJob('0 */15 * * * *', function () {
         try {
             token.updateCertificates();
         } catch (err) {
@@ -17,7 +17,7 @@ function getTokenCronJob() {
 }
 
 function getClientDbCronJob() {
-    return new CronJob('* */60 * * * *', function () {
+    return new CronJob('0 */60 * * * *', function () {
         try {
             clientdb.create();
         } catch (err) {
@@ -28,7 +28,7 @@ function getClientDbCronJob() {
 }
 
 function setup() {
-    log.info("Setup Cron tasks");
+    log.info("Setup Cron jobs");
     var jobs = {};
     jobs.token = getTokenCronJob();
     jobs.clientDb = getClientDbCronJob();
