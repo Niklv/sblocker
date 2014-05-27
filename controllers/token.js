@@ -1,4 +1,3 @@
-var async = require('async');
 var jwt = require('jwt-simple');
 var request = require('request');
 var config = require('../config');
@@ -48,18 +47,32 @@ function updateCertificates() {
 }
 
 function decodeToken(token) {
-    if (!token)
+    if (!token || !googleCerificates || !googleCerificates.first || !googleCerificates.second)
         return null;
-    if (!googleCerificates || !googleCerificates.first || !googleCerificates.second)
-        return null;
+    var decodedToken = null;
     try {
-
+        decodedToken = jwt.decode(token, googleCerificates.first);
     } catch (err) {
-        log.error(err);
-        return null;
+        decodedToken = null;
     }
+    try {
+        decodedToken = jwt.decode(token, googleCerificates.second);
+    } catch (err) {
+        decodedToken = null;
+    }
+    return decodedToken;
+}
+
+function verifyToken(token) {
+    return ((token)
+        //&& (token.azp == config.token.azp)
+        //&& (token.aud == config.token.aud)
+        //&& (token.email_verified)
+        //&& (token.exp > (new Date()).getTime() / 1000)
+        );
 }
 
 
 module.exports.updateCertificates = updateCertificates;
 module.exports.decodeToken = decodeToken;
+module.exports.verifyToken = verifyToken;

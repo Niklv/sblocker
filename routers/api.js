@@ -1,55 +1,76 @@
 var express = require("express");
 var fs = require("fs");
-var jwt = require('jwt-simple');
 var path = require("path");
+var async = require("async");
 var config = require("../config");
 var ServerError = require("../utils/error").ServerError;
 var log = require('../utils/log')(module);
+var tokenUtils = require('../controllers/token');
+var User = require('../models').User;
 var isDownloadDbLocked = false;
 
 var api = express.Router();
 
 
-function lockDbDownload(isLocked){
-    if(isLocked)
+function lockDbDownload(isLocked) {
+    if (isLocked)
         log.debug("ClientDb download is locked");
     else
         log.debug("ClientDb download is unlocked");
     isDownloadLocked = isLocked;
 }
 
-function verifyToken(token) {
-    var decoded = jwt.decode(token, "-----BEGIN CERTIFICATE-----\nMIICITCCAYqgAwIBAgIID6oI1BR2Z/0wDQYJKoZIhvcNAQEFBQAwNjE0MDIGA1UE\nAxMrZmVkZXJhdGVkLXNpZ25vbi5zeXN0ZW0uZ3NlcnZpY2VhY2NvdW50LmNvbTAe\nFw0xNDA1MjYxMDQzMzRaFw0xNDA1MjcyMzQzMzRaMDYxNDAyBgNVBAMTK2ZlZGVy\nYXRlZC1zaWdub24uc3lzdGVtLmdzZXJ2aWNlYWNjb3VudC5jb20wgZ8wDQYJKoZI\nhvcNAQEBBQADgY0AMIGJAoGBAOto6uN++hA9N3TGTUXdlNQ2lzGnhPq7IX7xEMPi\ncKSy0TTvrhABLDNGLj+tQ8kUE50tLtzwSwBEX9mzAxOymTTwzVq7w+KkRQ6SHbnk\nXNjHG4Y8+WOr59Tc0xY71b66Nay4Le5XqOU++bCJ6ZJKQQf/bzgDMNvpMiIYtJ1p\n394ZAgMBAAGjODA2MAwGA1UdEwEB/wQCMAAwDgYDVR0PAQH/BAQDAgeAMBYGA1Ud\nJQEB/wQMMAoGCCsGAQUFBwMCMA0GCSqGSIb3DQEBBQUAA4GBAMzAPSqyXVs91Pnc\niA5nU+V2vKYMC59AlS6nU9cAuxe9UoTFHb0SfmhApSgi1P3v3Tkj0zNFQ2/dnMWQ\nw1VorondhjBW6zQg3jv49dJTgJ8TDJWENOpgj89VxarGJPeqZeV/jE6rNJhg2iHp\n3ytiZ3Xv+mrwK4T/3KBp+Q2wbrUo\n-----END CERTIFICATE-----\n");
-    log.info(decoded);
-}
-
 function getUser(token) {
 
 }
 
+//Example token
+//eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk5ZDMxNjRiZDVmNjJmODk0N2YzZWUyNjZiNjIzNDA1M2Q2ZjJjZjAifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiaWQiOiIxMTE0ODQxMTQ4MDM3OTkwNDQzMjIiLCJzdWIiOiIxMTE0ODQxMTQ4MDM3OTkwNDQzMjIiLCJhenAiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6Im5pa2x2b3ZAZ21haWwuY29tIiwiYXRfaGFzaCI6ImpoUndrTk5heS1QZHE3Z2FuVC1jNGciLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXVkIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwidG9rZW5faGFzaCI6ImpoUndrTk5heS1QZHE3Z2FuVC1jNGciLCJ2ZXJpZmllZF9lbWFpbCI6dHJ1ZSwiY2lkIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiaWF0IjoxNDAxMTk2Mjg5LCJleHAiOjE0MDEyMDAxODl9.r6AxwvtSoxdfIZ931KNX4G9Wae6wLQyWSjEtOl62F0iH9fYtc_PBH3iFNQPRliVatV3WkIiw6l0VyJN9jUJFZBCEktFgCnJJw9vw4sUBFO-d5V4uAJMOiho7iPP0_5_xywfe4orXwrTtpME6QuQM5AUdcxdk8RTxmWxU2sWl7wo
+
 api.use(function (req, res, next) {
-    var params = {};
-    if (req.method === 'GET')
-        params = req.query;
-    else
-        params = req.body;
+    var params = req.query;
     if (!params.version)
         return next(new ServerError("Api version must be set", 1000, 400));
     if (params.version != 1)
         return next(new ServerError("Wrong API version", 1001, 400));
     if (!params.token)
         return next(new ServerError("Token must be set", 1002, 403));
-    //TODO: JSON WEB TOKEN VALIDATION
-    verifyToken(params.token);
-    //TODO: FIND USER
-    //TODO: IF NEW THEN ADD TO DB NEW USER
-    //TODO: REQ.USER
-    next();
+    var decodedToken = tokenUtils.decodeToken(params.token);
+    if (!decodedToken)
+        return next(new ServerError("Token signature verification failed", 1003, 403));
+    if (!tokenUtils.verifyToken(decodedToken))
+        return next(new ServerError("Token verification failed", 1004, 403));
+    async.waterfall([
+        function (done) {
+            User.findOne({email: decodedToken.email}, done);
+        },
+        function (user, done) {
+            if (!user) {
+                user = new User({
+                    email: decodedToken.email,
+                    isEmailVerified: decodedToken.email_verified,
+                    createdAt: new Date()
+                });
+                user.save(done)
+            } else if (user.isBanned)
+                next(new ServerError("User banned", 1005, 403));
+            else
+                done(null, user);
+        }
+    ], function (err, user) {
+        if (err)
+            return next(err);
+        req.decodedToken = decodedToken;
+        req.user = user;
+        console.log(decodedToken, user);
+        next();
+    });
+
 });
 
 api.get('/phone_db', function (req, res, next) {
-    if(isDownloadDbLocked)
-        next(new ServerError("Updating DB, try again in 2 minutes", 1005, 500));
+    if (isDownloadDbLocked)
+        next(new ServerError("Updating DB, try again in 2 minutes", 1106, 500));
     var dbpath = path.resolve(__dirname + '/../' + config.data_path + config.clientdb.name + config.gzip_postfix);
     fs.exists(dbpath, function (exists) {
         if (exists) {
@@ -63,7 +84,7 @@ api.get('/phone_db', function (req, res, next) {
                 }
             });
         } else
-            next(new ServerError("File serving error", 1004, 500));
+            next(new ServerError("File serving error", 1105, 500));
     });
 });
 
