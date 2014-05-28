@@ -69,7 +69,7 @@ function verifyToken(token) {
         //&& (token.azp == config.token.azp)
         //&& (token.aud == config.token.aud)
         //&& (token.email_verified)
-        //&& (token.exp > (new Date()).getTime() / 1000)
+        && (token.exp > (new Date()).getTime() / 1000)
         );
 }
 

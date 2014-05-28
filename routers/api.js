@@ -89,7 +89,7 @@ api.get('/phone_db', function (req, res, next) {
 
 api.post('/change_phone', function (req, res, next) {
     var params = req.body;
-    if((!params) || (typeof params != 'array'))
+    if((!params) || (typeof params.phone_list != 'array'))
         return next(new ServerError("Wrong body content", 1201, 400));
 
     res.json(200, {status: 'In progress'});
