@@ -55,11 +55,12 @@ function decodeToken(token) {
     } catch (err) {
         decodedToken = null;
     }
-    try {
-        decodedToken = jwt.decode(token, googleCerificates.second);
-    } catch (err) {
-        decodedToken = null;
-    }
+    if (!decodedToken)
+        try {
+            decodedToken = jwt.decode(token, googleCerificates.second);
+        } catch (err) {
+            decodedToken = null;
+        }
     return decodedToken;
 }
 
