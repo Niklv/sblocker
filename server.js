@@ -21,10 +21,10 @@ function start() {
         var nums = [];
         for (var i = 0; i < 100; i++)
             nums[i] = {
-                number: "" + (89160000000 + i),
+                number: "" + (89060000000 + i),
                 createdAt: new Date
             };
-        models.Blacklist.create(nums, function (err) {
+        models.Whitelist.create(nums, function (err) {
             if (err)
                 return next(err);
             res.send(200);
@@ -44,8 +44,6 @@ start();
 var httpPort = config.http.port;
 app.listen(httpPort);
 log.info("Server start at " + httpPort);
-//require('./controllers/token').updateCertificates();
-//require('./controllers/clientdb')();
 app.cronJobs = require('./controllers/cron').setup();
 
 

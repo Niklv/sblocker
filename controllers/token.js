@@ -35,7 +35,6 @@ function updateCertificates() {
         } else {
             log.error("Error while updating Google certs:");
             log.error("Error:");
-            log.error(err.message);
             log.error(err);
             if (res)
                 log.error("Http code: " + res.statusCode);
