@@ -25,7 +25,7 @@ function getUser(token) {
 }
 
 //Example token
-//eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk5ZDMxNjRiZDVmNjJmODk0N2YzZWUyNjZiNjIzNDA1M2Q2ZjJjZjAifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiaWQiOiIxMTE0ODQxMTQ4MDM3OTkwNDQzMjIiLCJzdWIiOiIxMTE0ODQxMTQ4MDM3OTkwNDQzMjIiLCJhenAiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6Im5pa2x2b3ZAZ21haWwuY29tIiwiYXRfaGFzaCI6ImpoUndrTk5heS1QZHE3Z2FuVC1jNGciLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXVkIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwidG9rZW5faGFzaCI6ImpoUndrTk5heS1QZHE3Z2FuVC1jNGciLCJ2ZXJpZmllZF9lbWFpbCI6dHJ1ZSwiY2lkIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiaWF0IjoxNDAxMTk2Mjg5LCJleHAiOjE0MDEyMDAxODl9.r6AxwvtSoxdfIZ931KNX4G9Wae6wLQyWSjEtOl62F0iH9fYtc_PBH3iFNQPRliVatV3WkIiw6l0VyJN9jUJFZBCEktFgCnJJw9vw4sUBFO-d5V4uAJMOiho7iPP0_5_xywfe4orXwrTtpME6QuQM5AUdcxdk8RTxmWxU2sWl7wo
+//eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk5ZDMxNjRiZDVmNjJmODk0N2YzZWUyNjZiNjIzNDA1M2Q2ZjJjZjAifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiaWQiOiIxMTE0ODQxMTQ4MDM3OTkwNDQzMjIiLCJzdWIiOiIxMTE0ODQxMTQ4MDM3OTkwNDQzMjIiLCJhenAiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6Im5pa2x2b3ZAZ21haWwuY29tIiwiYXRfaGFzaCI6IlRIS015ZTJzclhkWXhyTklPS3BSbnciLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXVkIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwidG9rZW5faGFzaCI6IlRIS015ZTJzclhkWXhyTklPS3BSbnciLCJ2ZXJpZmllZF9lbWFpbCI6dHJ1ZSwiY2lkIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiaWF0IjoxNDAxMjcyMzU1LCJleHAiOjE0MDEyNzYyNTV9.bhjxGAh1X9_0GTDjYq3zZvMdmvIjkDXdpp3GgLoUmy1zP12s9zFfrpWTuyz__-qTu95Nx-brGBTE30NzTd2qUBd5VcJ2Wr2ESPzOCpg2XjKNFukISequD7d7_egzQrrhW1UmKJZddBTMXUBo1ca9slAyNdsk7eATrK7G4C4NV0Q
 
 api.use(function (req, res, next) {
     var params = req.query;
@@ -62,7 +62,6 @@ api.use(function (req, res, next) {
             return next(err);
         req.decodedToken = decodedToken;
         req.user = user;
-        console.log(decodedToken, user);
         next();
     });
 
@@ -88,8 +87,11 @@ api.get('/phone_db', function (req, res, next) {
     });
 });
 
-api.post('change_phone', function (req, res) {
-    //TODO: POST NEW PHONES TO DB
+api.post('/change_phone', function (req, res, next) {
+    var params = req.body;
+    if((!params) || (typeof params != 'array'))
+        return next(new ServerError("Wrong body content", 1201, 400));
+
     res.json(200, {status: 'In progress'});
 });
 
