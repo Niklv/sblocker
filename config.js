@@ -1,5 +1,8 @@
 module.exports = {
     http: {
+        port: 20303
+    },
+    https: {
         port: 20302
     },
     mongo: {
@@ -15,6 +18,12 @@ module.exports = {
     },
     clientdb: {
         name: "client.sqlite3"
+    },
+    security: {
+        server: {
+            cert: "content/security/server/cert.pem",
+            key: "content/security/server/key.pem"
+        }
     },
     data_path: "content/data/",
     temp_postfix: ".temp",

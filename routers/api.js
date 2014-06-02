@@ -53,7 +53,7 @@ api.use(function (req, res, next) {
                 });
                 user.save(done)
             } else if (user.isBanned)
-                next(new ServerError("User banned", 1005, 403));
+                next(new ServerError("User " + user.email + " banned", 1005, 403));
             else
                 done(null, user);
         }
@@ -89,7 +89,7 @@ api.get('/phone_db', function (req, res, next) {
 
 api.post('/change_phone', function (req, res, next) {
     var params = req.body;
-    if((!params) || (typeof params.phone_list != 'array'))
+    if ((!params) || (typeof params.phone_list != 'array'))
         return next(new ServerError("Wrong body content", 1201, 400));
 
     res.json(200, {status: 'In progress'});
