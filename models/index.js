@@ -22,6 +22,8 @@ mongoose.connection.once('open', function () {
 module.exports = _.extend({}, {
     Whitelist: require('./whitelist'),
     Blacklist: require('./blacklist'),
+    TransitionalWhitelist: require('./transitional_whitelist'),
+    TransitionalBlacklist: require('./transitional_blacklist'),
     User: require('./user')
 });
 
