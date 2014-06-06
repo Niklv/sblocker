@@ -94,14 +94,17 @@ function create() {
                 raw.pipe(zlib.createGzip({level: 9})).pipe(gzipped);
                 gzipped.on('close', done);
                 gzipped.on('error', done);
+            }, function (done) {
+                log.debug("Updete db version number");
+                models.SystemVariable.incClientDbVersion(done);
             }
         ],
-        function (err) {
+        function (err, version) {
             lockDbDownload(false);
             if (err)
                 log.error(err);
             else
-                log.info("New client DB created");
+                log.info("New client DB v" + version + " created");
         }
     );
 }
