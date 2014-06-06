@@ -27,6 +27,12 @@ module.exports = {
     },
     data_path: "content/data/",
     temp_postfix: ".temp",
-    gzip_postfix: ".gz"
+    gzip_postfix: ".gz",
+    system_variables: {
+        client_db_version: {
+            name: "client_db_version",
+            value: 0
+        }
+    }
 };
 

@@ -24,6 +24,7 @@ module.exports = _.extend({}, {
     Blacklist: require('./blacklist'),
     TransitionalWhitelist: require('./transitional_whitelist'),
     TransitionalBlacklist: require('./transitional_blacklist'),
+    SystemVariable: require('./system_variable'),
     User: require('./user')
 });
 
