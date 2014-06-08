@@ -26,8 +26,6 @@ function getUser(token) {
 
 }
 
-//Example token
-//eyJhbGciOiJSUzI1NiIsImtpZCI6Ijk5ZDMxNjRiZDVmNjJmODk0N2YzZWUyNjZiNjIzNDA1M2Q2ZjJjZjAifQ.eyJpc3MiOiJhY2NvdW50cy5nb29nbGUuY29tIiwiaWQiOiIxMTE0ODQxMTQ4MDM3OTkwNDQzMjIiLCJzdWIiOiIxMTE0ODQxMTQ4MDM3OTkwNDQzMjIiLCJhenAiOiI0MDc0MDg3MTgxOTIuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJlbWFpbCI6Im5pa2x2b3ZAZ21haWwuY29tIiwiYXRfaGFzaCI6IlRIS015ZTJzclhkWXhyTklPS3BSbnciLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiYXVkIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwidG9rZW5faGFzaCI6IlRIS015ZTJzclhkWXhyTklPS3BSbnciLCJ2ZXJpZmllZF9lbWFpbCI6dHJ1ZSwiY2lkIjoiNDA3NDA4NzE4MTkyLmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29tIiwiaWF0IjoxNDAxMjcyMzU1LCJleHAiOjE0MDEyNzYyNTV9.bhjxGAh1X9_0GTDjYq3zZvMdmvIjkDXdpp3GgLoUmy1zP12s9zFfrpWTuyz__-qTu95Nx-brGBTE30NzTd2qUBd5VcJ2Wr2ESPzOCpg2XjKNFukISequD7d7_egzQrrhW1UmKJZddBTMXUBo1ca9slAyNdsk7eATrK7G4C4NV0Q
 
 api.use(function (req, res, next) {
     var params = req.query;
@@ -101,10 +99,24 @@ api.get('/phone_db', function (req, res, next) {
 
 api.post('/change_phone', function (req, res, next) {
     var params = req.body;
-    if ((!params) || (typeof params.phone_list != 'array'))
+    log.info(params);
+    log.info(!params);
+    //log.info(typeof params.phone_list[0]);
+    log.info(typeof params.phone_list);
+    if ((!params) || (typeof params.phone_list != 'object') || (!params.phone_list.length))
         return next(new ServerError("Wrong body content", 1201, 400));
+    var data = params.phone_list;
+    for (var i = 0; i < data.length; i++) {
+        //TODO: check params
+    }
 
-    res.json(200, {status: 'In progress'});
+
+    async.waterfall([function (done) {
+        done()
+    }], function (err, res) {
+        res.json(200, {status: 'In progress'});
+    });
+
 });
 
 module.exports.router = api;
