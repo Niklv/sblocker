@@ -1,4 +1,5 @@
 var express = require("express");
+var _ = require("underscore");
 var fs = require("fs");
 var path = require("path");
 var async = require("async");
@@ -9,6 +10,8 @@ var tokenUtils = require('../controllers/token');
 var Models = require('../models');
 var User = Models.User;
 var SystemVariable = Models.SystemVariable;
+var TransitionalBlacklist = Models.TransitionalBlacklist;
+var TransitionalWhitelist = Models.TransitionalWhitelist;
 var isDownloadDbLocked = false;
 
 var api = express.Router();
@@ -98,26 +101,58 @@ api.get('/phone_db', function (req, res, next) {
 });
 
 api.post('/change_phone', function (req, res, next) {
-    var params = req.body;
-    log.info(params);
-    log.info(!params);
-    //log.info(typeof params.phone_list[0]);
-    log.info(typeof params.phone_list);
-    if ((!params) || (typeof params.phone_list != 'object') || (!params.phone_list.length))
-        return next(new ServerError("Wrong body content", 1201, 400));
-    var data = params.phone_list;
-    for (var i = 0; i < data.length; i++) {
-        //TODO: check params
+        var params = req.body;
+        var userbl = [], userwl = [];
+        try {
+            if ((!params) || (typeof params.phone_list != 'object') || (!params.phone_list.length))
+                return next(new ServerError("Wrong body content", 1201, 400));
+            var data = params.phone_list;
+            var phone = null, category = null;
+            for (var i = 0; i < data.length; i++) {
+                phone = data[i].phone;
+                if (!phone || typeof phone != 'string' || !phone.length)
+                    return next(new ServerError("Wrong body content", 1201, 400));
+                category = data[i].category;
+                if (!category || typeof category != 'string' || !category.length)
+                    return next(new ServerError("Wrong body content", 1201, 400));
+                phone = phone.toLowerCase();
+                category = category.toLowerCase();
+                if (category == 'black') {
+                    userbl.push(phone);
+                } else if (category == 'white') {
+                    userwl.push(phone);
+                } else
+                    return next(new ServerError("Wrong body content", 1201, 400));
+            }
+        } catch
+            (err) {
+            log.err(err);
+            next(new ServerError("Wrong body content", 1201, 400));
+        }
+
+
+        processIncomingNumberList(userbl, TransitionalBlacklist, function (err) {
+            res.json(200, {status: 'In progress'});
+        });
+
+
+        //function (done) {
+        //  model.update({number: {$in: data}}, {$inc: {occurrence: 1}}, done);
+        //}
+
     }
+);
 
-
-    async.waterfall([function (done) {
-        done()
-    }], function (err, res) {
-        res.json(200, {status: 'In progress'});
-    });
-
-});
+function processIncomingNumberList(data, model, cb) {
+    async.waterfall([
+        function (done) {
+            model.distinct('number', {number: {$in: data}}, done);
+        },
+        function (existed, done) {
+            done(null, existed, _.difference(data, existed));
+        }
+    ], cb);
+}
 
 module.exports.router = api;
 module.exports.lockDbDownload = lockDbDownload;
