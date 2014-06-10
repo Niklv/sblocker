@@ -131,28 +131,63 @@ api.post('/change_phone', function (req, res, next) {
         }
 
 
-        processIncomingNumberList(userbl, TransitionalBlacklist, function (err) {
-            res.json(200, {status: 'In progress'});
+        async.parallel({
+            blacklist: async.apply(processList, TransitionalBlacklist, userbl),
+            whitelist: async.apply(processList, TransitionalWhitelist, userwl)
+        }, function (err, result) {
+            console.log(err);
+            console.log(result);
+            res.json({status: "InDev"});
         });
-
-
-        //function (done) {
-        //  model.update({number: {$in: data}}, {$inc: {occurrence: 1}}, done);
-        //}
-
     }
 );
 
-function processIncomingNumberList(data, model, cb) {
+
+function processList(model, data, done) {
+    async.waterfall([
+        async.apply(getUnexistedNumbers, model, data),
+        function (existed, unexisted, done) {
+            async.parallel({
+                existed: async.apply(incExistedNumbers, model, existed),
+                unexisted: async.apply(createUnexistedNumbers, model, unexisted)
+            }, done);
+        }
+    ], done);
+}
+
+function getUnexistedNumbers(model, data, done) {
     async.waterfall([
         function (done) {
-            model.distinct('number', {number: {$in: data}}, done);
+            model.distinct('number', {number: {$in: data}}, done)
         },
         function (existed, done) {
             done(null, existed, _.difference(data, existed));
         }
-    ], cb);
+    ], done);
 }
+
+function incExistedNumbers(model, existed, done) {
+    if (existed && existed.length)
+        model.update({number: {$in: existed}}, {$inc: {occurrence: 1}}, function (err, data) {
+            console.log(arguments);
+            done(err, []);
+        });
+    else
+        done(null, []);
+
+}
+
+function createUnexistedNumbers(model, unexisted, done) {
+    log.info("createUnexistedNumbers", unexisted, model.modelName);
+    if (unexisted && unexisted.length) {
+        for (var i = 0; i < unexisted.length; i++)
+            unexisted[i] = { number: unexisted[i] };
+        model.create(unexisted, done);
+    }
+    else
+        done(null, []);
+}
+
 
 module.exports.router = api;
 module.exports.lockDbDownload = lockDbDownload;
