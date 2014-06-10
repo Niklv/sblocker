@@ -117,11 +117,9 @@ api.post('/change_phone', function (req, res, next) {
                     return next(new ServerError("Wrong body content", 1201, 400));
                 phone = phone.toLowerCase();
                 category = category.toLowerCase();
-                if (category == 'black') {
-                    userbl.push(phone);
-                } else if (category == 'white') {
-                    userwl.push(phone);
-                } else
+                if (category == 'black' || category == 'white')
+                    userbl.push({phone: phone, category: category});
+                else
                     return next(new ServerError("Wrong body content", 1201, 400));
             }
         } catch
@@ -130,15 +128,20 @@ api.post('/change_phone', function (req, res, next) {
             next(new ServerError("Wrong body content", 1201, 400));
         }
 
-
-        async.parallel({
-            blacklist: async.apply(processList, TransitionalBlacklist, userbl),
-            whitelist: async.apply(processList, TransitionalWhitelist, userwl)
-        }, function (err, result) {
-            console.log(err);
-            console.log(result);
+        async.waterfall([function(done){}], function(err, data){
             res.json({status: "InDev"});
         });
+
+
+        /*
+         async.parallel({
+         blacklist: async.apply(processList, TransitionalBlacklist, userbl),
+         whitelist: async.apply(processList, TransitionalWhitelist, userwl)
+         }, function (err, result) {
+         console.log(err);
+         console.log(result);
+         res.json({status: "InDev"});
+         });*/
     }
 );
 
