@@ -18,9 +18,13 @@ var user_list = new Schema({
         enum: ['black', 'white'],
         index: true
     },
-    createdAt: {
+    updatedAt: {
         type: Date
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
-});
+}).index({user: 1, phone: 1}, {unique: true});
 
 module.exports = mongoose.model('user_list', user_list);
