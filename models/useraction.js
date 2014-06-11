@@ -17,7 +17,8 @@ var useraction = new Schema({
         type: Schema.Types.Mixed
     },
     createdAt: {
-        type: Date
+        type: Date,
+        default: Date.now
     }
 });
 

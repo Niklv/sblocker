@@ -5,6 +5,7 @@ module.exports = {
         index: { unique: true }
     },
     createdAt: {
-        type: Date
+        type: Date,
+        default: Date.now
     }
 };
