@@ -123,7 +123,7 @@ api.post('/change_phone', function (req, res, next) {
                     return next(new ServerError("Wrong body content", 1201, 400));
                 phone = phone.toLowerCase();
                 category = category.toLowerCase();
-                if (UserList.schema.paths.category.enumValues.indexOf(category) > -1)
+                if (UserList.schema.paths.category.enumValues.indexOf(category) > -1)  //TODO: check for multiple number at once
                     userlist.push({phone: phone, category: category});
                 else
                     return next(new ServerError("Wrong body content", 1201, 400));
