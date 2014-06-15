@@ -40,8 +40,8 @@ function start() {
     });
     app.use(error.PageNotFound);
     app.use(error.handler);
-    app.cronJobs = require('./controllers/cron').setup();
-    require('./controllers/system_variable').initializeIfNotExist();
+    //app.cronJobs = require('./controllers/cron').setup();
+    //require('./controllers/system_variable').initializeIfNotExist();
     log.info("Server config complete!");
 }
 
@@ -61,6 +61,3 @@ http.createServer(function (req, res) {
 }).listen(config.http.port, function () {
     log.info("HTTP Redirect server started at " + config.http.port);
 });
-
-
-

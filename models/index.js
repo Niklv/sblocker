@@ -16,17 +16,12 @@ mongoose.connection.on('error', function (err) {
 
 mongoose.connection.once('open', function () {
     log.info("Connected to MongoDB");
+    require('../controllers/serverdb').update();
 });
 
 
-module.exports = _.extend({}, {
-    Whitelist: require('./whitelist'),
-    Blacklist: require('./blacklist'),
-    TransitionalWhitelist: require('./transitional_whitelist'),
-    TransitionalBlacklist: require('./transitional_blacklist'),
-    SystemVariable: require('./system_variable'),
-    UserList: require('./user_list'),
-    User: require('./user')
-});
-
-
+module.exports.Whitelist = require('./whitelist');
+module.exports.Blacklist = require('./blacklist');
+module.exports.SystemVariable = require('./system_variable');
+module.exports.UserList = require('./user_list');
+module.exports.User = require('./user');

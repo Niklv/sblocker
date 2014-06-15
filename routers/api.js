@@ -110,20 +110,24 @@ api.post('/change_phone', function (req, res, next) {
             userlist = [],
             i = 0;
         try {
-            if ((!params) || (typeof params.phone_list != 'object') || (!params.phone_list.length))
+            if ((!params) || !_.isArray(params.phone_list) || (!params.phone_list.length))
                 return next(new ServerError("Wrong body content", 1201, 400));
-            var data = params.phone_list;
+            if (params.phone_list.length > 100)
+                return next(new ServerError("Too many numbers at once", 1202, 400));
+            var data = _.uniq(params.phone_list, false, function (item) {
+                return item.phone
+            });
             var phone = null, category = null;
             for (i = 0; i < data.length; i++) {
                 phone = data[i].phone;
-                if (!phone || typeof phone != 'string' || !phone.length)
+                if (!phone || !_.isString(phone) || !phone.length)
                     return next(new ServerError("Wrong body content", 1201, 400));
                 category = data[i].category;
-                if (!category || typeof category != 'string' || !category.length)
+                if (!category || !_.isString(category) || !category.length)
                     return next(new ServerError("Wrong body content", 1201, 400));
                 phone = phone.toLowerCase();
                 category = category.toLowerCase();
-                if (UserList.schema.paths.category.enumValues.indexOf(category) > -1)  //TODO: check for multiple number at once
+                if (UserList.schema.paths.category.enumValues.indexOf(category) > -1)
                     userlist.push({phone: phone, category: category});
                 else
                     return next(new ServerError("Wrong body content", 1201, 400));
