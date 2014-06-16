@@ -1,4 +1,5 @@
 //libs
+var _ = require('underscore');
 var fs = require('fs');
 var express = require('express');
 var http = require('http');
@@ -22,18 +23,24 @@ function start() {
     app.use(require('method-override')());
     app.use(require('body-parser')());
     /*app.get('/fill_mongo', function (req, res, next) {
-     var nums = [];
-     for (var i = 0; i < 100; i++)
-     nums[i] = {
-     number: "" + (89060000000 + i),
-     createdAt: new Date
-     };
-     models.Whitelist.create(nums, function (err) {
-     if (err)
-     return next(err);
-     res.send(200);
-     });
-     });*/
+        var nums = [];
+        for (var i = 0; i < 100; i++)
+            nums[i] = {
+                number: "" + (89060000000 + i),
+                goodness: 20 + _.random(0, 20),
+                createdAt: new Date
+            };
+        for (i = 100; i < 200; i++)
+            nums[i] = {
+                number: "" + (89050000000 + i),
+                goodness: -20 - _.random(0, 20)
+            };
+        models.GlobalNumber.create(nums, function (err) {
+            if (err)
+                return next(err);
+            res.send(200);
+        });
+    });*/
     app.use('/api', require('./routers/api').router);
     app.get('/', function (req, res) {
         res.json({status: 'server is running'});

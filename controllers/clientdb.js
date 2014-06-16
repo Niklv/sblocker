@@ -1,6 +1,8 @@
 var fs = require('fs');
 var zlib = require('zlib');
 var models = require('../models');
+var GlobalNumber = models.GlobalNumber;
+var SystemVariable = models.SystemVariable;
 var async = require('async');
 var sqlite3 = require('sqlite3').verbose();
 var path = require('path');
@@ -9,18 +11,18 @@ var config = require('../config');
 var lockDbDownload = require('../routers/api').lockDbDownload;
 
 
-var DB_NAME = config.clientdb.name;
+var DB_FILE_NAME = config.clientdb.name;
 var TEMP_POSTFIX = config.temp_postfix;
 var GZIP_POSTFIX = config.gzip_postfix;
 var DATA_PATH = "/../" + config.data_path;
-var DB_PATH = path.resolve(__dirname + DATA_PATH + DB_NAME);
+var DB_PATH = path.resolve(__dirname + DATA_PATH + DB_FILE_NAME);
 var GZIPPED_PATH = DB_PATH + GZIP_POSTFIX;
 var TEMP_PATH = DB_PATH + TEMP_POSTFIX;
 
 
 function create(callback) {
     log.info("Start creating clientDB");
-    var db;
+    var db = null;
     async.waterfall([
             function (done) {
                 log.debug("Check for old temp file");
@@ -41,18 +43,42 @@ function create(callback) {
             function (done) {
                 log.debug("Create db structure");
                 db.serialize(function () {
-                    db.run("DROP TABLE IF EXISTS blacklist");
-                    db.run("DROP TABLE IF EXISTS whitelist");
-                    db.run("CREATE TABLE blacklist (phone STRING PRIMARY KEY)");
-                    db.run("CREATE TABLE whitelist (phone STRING PRIMARY KEY)");
+                    db.run("DROP TABLE IF EXISTS globalNumbers");
+                    db.run("CREATE TABLE globalnumbers (number STRING PRIMARY KEY, spamProbability INT)");
                     done();
                 });
             },
             function (done) {
-                fillClientSliteDb(db, models.Blacklist, 'blacklist', done);
+                log.debug("Aggregate global numbers");
+                GlobalNumber.aggregate(
+                    /*{$match: {$or: [
+                        {goodness: {$gte: config.criteria.wl}},
+                        {goodness: {$lte: -config.criteria.bl}}
+                    ]}}, */
+                    {$project: {
+                        _id: 0,
+                        number: 1,
+                        spamProbability: {$cond: {
+                            if: {$gte: [ "$goodness", 0 ]},
+                            then: 0,
+                            else: 1
+                        }}
+                    }},
+                    done
+                );
             },
-            function (done) {
-                fillClientSliteDb(db, models.Whitelist, 'whitelist', done);
+            function (rows, done) {
+                console.log(rows);
+                log.debug("Prepare SQL statement");
+                var stmt = db.prepare("INSERT INTO globalNumbers VALUES (?, ?)");
+                async.each(rows, function (item, cb) {
+                    stmt.run(item.number, item.spamProbability, cb);
+                }, function (err) {
+                    done(err, stmt);
+                });
+            }, function (stmt, done) {
+                log.debug("Execute SQL statement");
+                stmt.finalize(done);
             },
             function (done) {
                 log.debug("Close temp db");
@@ -94,7 +120,8 @@ function create(callback) {
                 raw.pipe(zlib.createGzip({level: 9})).pipe(gzipped);
                 gzipped.on('close', done);
                 gzipped.on('error', done);
-            }, function (done) {
+            },
+            function (done) {
                 log.debug("Updete db version number");
                 models.SystemVariable.incClientDbVersion(done);
             }
@@ -109,28 +136,5 @@ function create(callback) {
         }
     );
 }
-
-
-function fillClientSliteDb(sqlitedb, mongooseModel, tableName, cb) {
-    async.waterfall([
-        function (done) {
-            log.debug("Find " + mongooseModel.modelName + " numbers");
-            mongooseModel.find({}, done);
-        },
-        function (rows, done) {
-            log.debug("Prepare SQL statement");
-            var stmt = sqlitedb.prepare("INSERT INTO " + tableName + " VALUES (?)");
-            async.each(rows, function (item, cb) {
-                stmt.run(item.number, cb);
-            }, function (err) {
-                done(err, stmt);
-            });
-        }, function (stmt, done) {
-            log.debug("Execute SQL statement");
-            stmt.finalize(done);
-        }
-    ], cb);
-}
-
 
 module.exports.create = create;

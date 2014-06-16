@@ -16,7 +16,7 @@ mongoose.connection.on('error', function (err) {
 
 mongoose.connection.once('open', function () {
     log.info("Connected to MongoDB");
-    require('../controllers/serverdb').update();
+    //require('../controllers/serverdb').update();
 });
 
 
