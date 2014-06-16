@@ -18,7 +18,7 @@ var GZIPPED_PATH = DB_PATH + GZIP_POSTFIX;
 var TEMP_PATH = DB_PATH + TEMP_POSTFIX;
 
 
-function create() {
+function create(callback) {
     log.info("Start creating clientDB");
     var db;
     async.waterfall([
@@ -105,6 +105,7 @@ function create() {
                 log.error(err);
             else
                 log.info("New client DB v" + version + " created");
+            callback && callback(err, version);
         }
     );
 }

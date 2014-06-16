@@ -8,7 +8,7 @@ var googleCerificates = {
     second: null
 };
 
-function updateCertificates() {
+function updateCertificates(callback) {
     log.info("Start updating google certificates");
     request({
         url: config.token.google_cert,
@@ -22,24 +22,28 @@ function updateCertificates() {
                 if (certs.length != 2) {
                     log.error("More or less than two google certs!");
                     log.error(certs);
+                    callback && callback(new Error("Error white updating certificates"));
                 } else {
                     googleCerificates.first = certs[0];
                     googleCerificates.second = certs[1];
                     log.info("Google certs successfully updated");
+                    callback && callback(null);
                 }
             } else {
                 log.error("Body not in json format");
                 log.error("Body content:");
                 log.error(body);
+                callback && callback(new Error("Error white updating certificates"));
             }
         } else {
             log.error("Error while updating Google certs:");
             log.error("Error:");
-            log.error(err);
+            log.error(err.stack);
             if (res)
                 log.error("Http code: " + res.statusCode);
             log.error("Body:");
             log.error(body);
+            callback && callback(new Error("Error white updating certificates"));
         }
     });
 

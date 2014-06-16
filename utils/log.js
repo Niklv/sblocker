@@ -8,9 +8,14 @@ function getLogger(module) {
         transports: [
             new winston.transports.Console({
                 colorize: true,
+                prettyPrint: true,
                 timestamp: function () {
                     return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
                 },
+                /*json: true,
+                stringify: function (obj) {
+                    return JSON.stringify(obj, null, 2);
+                },*/
                 level: ENV == 'production' ? 'info' : 'debug',
                 label: path
             })

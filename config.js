@@ -25,6 +25,10 @@ module.exports = {
             key: "content/security/server/key.pem"
         }
     },
+    criteria:{
+        wl: 2,
+        bl: 2
+    },
     data_path: "content/data/",
     temp_postfix: ".temp",
     gzip_postfix: ".gz",

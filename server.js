@@ -40,8 +40,8 @@ function start() {
     });
     app.use(error.PageNotFound);
     app.use(error.handler);
-    //app.cronJobs = require('./controllers/cron').setup();
-    //require('./controllers/system_variable').initializeIfNotExist();
+    require('./controllers/on_start')();
+    app.cronJobs = require('./controllers/cron').setup();
     log.info("Server config complete!");
 }
 
