@@ -52,20 +52,23 @@ function create(callback) {
                 log.debug("Aggregate global numbers");
                 GlobalNumber.aggregate(
                     /*{$match: {$or: [
-                        {goodness: {$gte: config.criteria.wl}},
-                        {goodness: {$lte: -config.criteria.bl}}
-                    ]}}, */
+                     {goodness: {$gte: config.criteria.wl}},
+                     {goodness: {$lte: -config.criteria.bl}}
+                     ]}}, */
                     {$project: {
                         _id: 0,
                         number: 1,
-                        spamProbability: {$cond: {
-                            if: {$gte: [ "$goodness", 0 ]},
-                            then: 0,
-                            else: 1
-                        }}
-                    }},
+                        goodness: 1,
+                        spamProbability: {$cond: [
+                            {$gt: [ "$goodness", 0 ]},
+                            0,
+                            1
+                        ]}
+                    }
+                    },
                     done
-                );
+                )
+                ;
             },
             function (rows, done) {
                 console.log(rows);
@@ -76,14 +79,18 @@ function create(callback) {
                 }, function (err) {
                     done(err, stmt);
                 });
-            }, function (stmt, done) {
+            }
+            ,
+            function (stmt, done) {
                 log.debug("Execute SQL statement");
                 stmt.finalize(done);
-            },
+            }
+            ,
             function (done) {
                 log.debug("Close temp db");
                 db.close(done);
-            },
+            }
+            ,
             function (done) {
                 lockDbDownload(true);
                 log.debug("Check for current db file");
@@ -96,11 +103,13 @@ function create(callback) {
                         done();
                     }
                 });
-            },
+            }
+            ,
             function (done) {
                 log.debug("Rename temp to current");
                 fs.rename(TEMP_PATH, DB_PATH, done);
-            },
+            }
+            ,
             function (done) {
                 log.debug("Check for current gzipped db file");
                 fs.exists(GZIPPED_PATH, function (exists) {
@@ -112,7 +121,8 @@ function create(callback) {
                         done();
                     }
                 });
-            },
+            }
+            ,
             function (done) {
                 log.debug("gZip current db");
                 var raw = fs.createReadStream(DB_PATH);
@@ -120,10 +130,12 @@ function create(callback) {
                 raw.pipe(zlib.createGzip({level: 9})).pipe(gzipped);
                 gzipped.on('close', done);
                 gzipped.on('error', done);
-            },
+            }
+            ,
             function (done) {
                 log.debug("Updete db version number");
-                models.SystemVariable.incClientDbVersion(done);
+                //models.SystemVariable.incClientDbVersion(done);
+                done();
             }
         ],
         function (err, version) {
@@ -134,7 +146,8 @@ function create(callback) {
                 log.info("New client DB v" + version + " created");
             callback && callback(err, version);
         }
-    );
+    )
+    ;
 }
 
 module.exports.create = create;
