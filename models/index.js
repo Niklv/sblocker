@@ -20,6 +20,8 @@ mongoose.connection.once('open', function () {
 });
 
 
+module.exports.GlobalNumber = require('./global_number');
+module.exports.UserNumber = require('./user_number');
 module.exports.Whitelist = require('./whitelist');
 module.exports.Blacklist = require('./blacklist');
 module.exports.SystemVariable = require('./system_variable');
