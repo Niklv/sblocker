@@ -9,7 +9,7 @@ var global_number = new Schema({
         index: { unique: true }
     },
     goodness: {
-        type: String,
+        type: Number,
         require: true,
         default: 0,
         index: true
