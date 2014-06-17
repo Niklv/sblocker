@@ -17,7 +17,8 @@ module.exports = {
         azp: "81527757855-pa29mpjfectmnhlp8vft7o4ktv8a1uge.apps.googleusercontent.com"
     },
     clientdb: {
-        name: "client.sqlite3"
+        name: "client.sqlite3",
+        table_name: "globalNumbers"
     },
     security: {
         server: {

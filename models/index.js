@@ -16,14 +16,10 @@ mongoose.connection.on('error', function (err) {
 
 mongoose.connection.once('open', function () {
     log.info("Connected to MongoDB");
-    //require('../controllers/serverdb').update();
 });
 
 
 module.exports.GlobalNumber = require('./global_number');
 module.exports.UserNumber = require('./user_number');
-module.exports.Whitelist = require('./whitelist');
-module.exports.Blacklist = require('./blacklist');
 module.exports.SystemVariable = require('./system_variable');
-module.exports.UserList = require('./user_list');
 module.exports.User = require('./user');

@@ -10,10 +10,8 @@ var tokenUtils = require('../controllers/token');
 var ObjectId = require('mongoose').Types.ObjectId;
 var Models = require('../models');
 var User = Models.User;
-var UserList = Models.UserList;
+var UserNumber = Models.UserNumber;
 var SystemVariable = Models.SystemVariable;
-var TransitionalBlacklist = Models.TransitionalBlacklist;
-var TransitionalWhitelist = Models.TransitionalWhitelist;
 var isDownloadDbLocked = false;
 
 var api = express.Router();
@@ -107,7 +105,7 @@ api.get('/phone_db', function (req, res, next) {
 
 api.post('/change_phone', function (req, res, next) {
         var params = req.body,
-            userlist = [],
+            userNumbers = [],
             i = 0;
         try {
             if ((!params) || !_.isArray(params.phone_list) || (!params.phone_list.length))
@@ -127,33 +125,45 @@ api.post('/change_phone', function (req, res, next) {
                     return next(new ServerError("Wrong body content", 1201, 400));
                 phone = phone.toLowerCase();
                 category = category.toLowerCase();
-                if (UserList.schema.paths.category.enumValues.indexOf(category) > -1)
-                    userlist.push({phone: phone, category: category});
+                if (UserNumber.schema.paths.category.enumValues.indexOf(category) > -1)
+                    userNumbers.push({number: phone, category: category});
                 else
                     return next(new ServerError("Wrong body content", 1201, 400));
             }
         } catch (err) {
-            log.error(err);
+            log.error(err.stack);
             next(new ServerError("Wrong body content", 1201, 400));
         }
 
         var uid = new ObjectId(req.user._id);
-        var Bulk = UserList.collection.initializeUnorderedBulkOp();
-        for (i = 0; i < userlist.length; i++)
+        var Bulk = UserNumber.collection.initializeUnorderedBulkOp();
+        var currentDate = new Date;
+        for (i = 0; i < userNumbers.length; i++)
             Bulk.find({
                 user: uid,
-                phone: userlist[i].phone
+                number: userNumbers[i].number
             }).upsert().updateOne({
-                $set: {category: userlist[i].category, updatedAt: new Date},
-                $setOnInsert: {createdAt: new Date}
+                $set: {category: userNumbers[i].category, updatedAt: currentDate},
+                $setOnInsert: {createdAt: currentDate}
             });
 
         Bulk.execute(function (err, data) {
-            log.info(data.toJSON()); //TODO: CHECK FOR ERRORS ok is 1?
-            if (err)
-                next(err);
-            else
+            if (err) {
+                log.error(err.stack);
+                log.error("Bulk data");
+                log.error(data.toJSON());
+                log.error("userNumbers");
+                log.error(userNumbers);
+                next(new ServerError("Database error while saving", 1203, 500));
+            } else if (data && data.isOk())
                 res.json({result: "success"});
+            else {
+                log.error("Bulk data");
+                log.error(data.toJSON());
+                log.error("userNumbers");
+                log.error(userNumbers);
+                next(new ServerError("Operation not performed", 1204, 500));
+            }
         });
     }
 );

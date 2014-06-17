@@ -12,6 +12,7 @@ var lockDbDownload = require('../routers/api').lockDbDownload;
 
 
 var DB_FILE_NAME = config.clientdb.name;
+var TABLE_NAME = config.clientdb.table_name;
 var TEMP_POSTFIX = config.temp_postfix;
 var GZIP_POSTFIX = config.gzip_postfix;
 var DATA_PATH = "/../" + config.data_path;
@@ -43,8 +44,8 @@ function create(callback) {
             function (done) {
                 log.debug("Create db structure");
                 db.serialize(function () {
-                    db.run("DROP TABLE IF EXISTS globalNumbers");
-                    db.run("CREATE TABLE globalnumbers (number STRING PRIMARY KEY, spamProbability INT)");
+                    db.run("DROP TABLE IF EXISTS " + TABLE_NAME);
+                    db.run("CREATE TABLE " + TABLE_NAME + " (number STRING PRIMARY KEY, spamProbability INT)");
                     done();
                 });
             },
@@ -69,7 +70,7 @@ function create(callback) {
             },
             function (rows, done) {
                 log.debug("Prepare SQL statement");
-                var stmt = db.prepare("INSERT INTO globalNumbers VALUES (?, ?)");
+                var stmt = db.prepare("INSERT INTO " + TABLE_NAME + " VALUES (?, ?)");
                 async.each(rows, function (item, cb) {
                     stmt.run(item.number, item.spamProbability, cb);
                 }, function (err) {
@@ -100,8 +101,7 @@ function create(callback) {
             function (done) {
                 log.debug("Rename temp to current");
                 fs.rename(TEMP_PATH, DB_PATH, done);
-            }
-            ,
+            },
             function (done) {
                 log.debug("Check for current gzipped db file");
                 fs.exists(GZIPPED_PATH, function (exists) {
@@ -121,12 +121,10 @@ function create(callback) {
                 raw.pipe(zlib.createGzip({level: 9})).pipe(gzipped);
                 gzipped.on('close', done);
                 gzipped.on('error', done);
-            }
-            ,
+            },
             function (done) {
                 log.debug("Updete db version number");
-                //models.SystemVariable.incClientDbVersion(done);
-                done();
+                models.SystemVariable.incClientDbVersion(done);
             }
         ],
         function (err, version) {
@@ -137,8 +135,7 @@ function create(callback) {
                 log.info("New client DB v" + version + " created");
             callback && callback(err, version);
         }
-    )
-    ;
+    );
 }
 
 module.exports.create = create;

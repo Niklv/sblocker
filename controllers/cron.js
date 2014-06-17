@@ -19,20 +19,30 @@ function getTokenCronJob() {
 }
 
 function getClientDbCronJob() {
-    return new CronJob('0 */60 * * * *', function () {
+    return new CronJob('0 5 * * * *', function () { // EVERY DAY AT 5:00
+        //return new CronJob('0 */60 * * * *', function () { // EVERY HOUR
+        //return new CronJob('*/60 * * * * *', function () { // EVERY MINUTE FOR TESTING
         try {
-            async.series([
+            async.waterfall([
                 async.apply(serverdb.update),
-                async.apply(clientdb.create)
+                function (info, done) {
+                    if (info)
+                        clientdb.create(done);
+                    else {
+                        log.info("ClientDB update is not necessary");
+                        done();
+                    }
+
+                }
             ], function (err) {
                 if (err) {
                     log.error("Unknown error while updating client db");
-                    log.error(err);
+                    log.error(err.stack);
                 }
             });
         } catch (err) {
             log.error("Unknown error while updating client db");
-            log.error(err);
+            log.error(err.stack);
         }
     }, null, true);
 }

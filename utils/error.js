@@ -30,8 +30,10 @@ function ErrorHandler(err, req, res, next) {
             return res.json(err, {err: {num: "" + err, msg: "HTTP" + err + " error"}});
         else if (err.name == "serverError")
             return res.json(err.http_code, err.getJsonMessage());
-        else
+        else {
+            log.error(err.stack);
             return res.json(500, {err: {num: "500", msg: "Unknown error: " + err.message}})
+        }
     } else
         next();
 }

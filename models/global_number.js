@@ -14,6 +14,10 @@ var global_number = new Schema({
         default: 0,
         index: true
     },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    },
     createdAt: {
         type: Date,
         default: Date.now

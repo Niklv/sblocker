@@ -19,7 +19,8 @@ var user_number = new Schema({
         index: true
     },
     updatedAt: {
-        type: Date
+        type: Date,
+        default: Date.now
     },
     createdAt: {
         type: Date,
