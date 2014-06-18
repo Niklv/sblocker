@@ -13,8 +13,7 @@ module.exports = {
     },
     gcm: {
         sender: '81527757855',
-        server_api_key: "WpX4ZIAK11Jg8M9vFrK-ihKR",
-        secret: "WpX4ZIAK11Jg8M9vFrK-ihKR"
+        server_api_key: "AIzaSyCc2_UwqljM_a9BFmRyTa05Wyuh7H-4GIA"
     },
     token: {
         google_cert: "https://www.googleapis.com/oauth2/v1/certs",
