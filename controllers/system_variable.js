@@ -1,17 +1,17 @@
 var async = require('async');
 var log = require('../utils/log')(module);
 var SystemVariable = require('../models').SystemVariable;
-var config = require('../config');
+var nconf = require('nconf');
 
 function initializeIfNotExist(callback) {
     async.parallel([
             function (cb) {
-                SystemVariable.findOne({ name: config.system_variables.client_db_version.name },
+                SystemVariable.findOne({ name: nconf.get("sys_vars:client_db_version:name") },
                     function (err, data) {
                         if (err || data)
                             cb(err, data);
                         else
-                            new SystemVariable(config.system_variables.client_db_version).save(function (err, newvar) {
+                            new SystemVariable(nconf.get("sys_vars:client_db_version")).save(function (err, newvar) {
                                 cb(err, newvar);
                             });
                     }

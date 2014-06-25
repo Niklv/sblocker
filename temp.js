@@ -1,1 +1,1 @@
-require('./controllers/push_notification').android.pushUpdateMessage();
+require('./controllers/push_notification').android.pushMessage();

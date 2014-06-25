@@ -1,0 +1,21 @@
+{
+    "cron": {
+        "updateDBTime": "0 10 * * * *"
+    },
+    "mongo": {
+        "url": "mongodb://37.139.15.10:27017/sblocker",
+        "user": "node_sblocker",
+        "pass": "SYFGsBY&g9&gEG9hfusn02n0fN:wm cmawf_JSRBGBS824t240cwm&#m2"
+    },
+    "port": {
+        "https": 20304,
+        "http": 20305
+    },
+    "gcm": {
+        "dry_run": false
+    },
+    "criteria": {
+        "wl": 10,
+        "bl": 10
+    }
+}

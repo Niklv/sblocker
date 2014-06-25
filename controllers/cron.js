@@ -1,3 +1,4 @@
+var nconf = require('nconf');
 var async = require('async');
 var cron = require('cron');
 var CronJob = cron.CronJob;
@@ -8,7 +9,7 @@ var log = require('../utils/log')(module);
 
 
 function getTokenCronJob() {
-    return new CronJob('0 */30 * * * *', function () {
+    return new CronJob(nconf.get('cron:updateTokenTime'), function () {
         try {
             token.updateCertificates();
         } catch (err) {
@@ -19,9 +20,7 @@ function getTokenCronJob() {
 }
 
 function getClientDbCronJob() {
-    return new CronJob('0 5 * * * *', function () { // EVERY DAY AT 5:00
-        //return new CronJob('0 */60 * * * *', function () { // EVERY HOUR
-        //return new CronJob('*/60 * * * * *', function () { // EVERY MINUTE FOR TESTING
+    return new CronJob(nconf.get('cron:updateDBTime'), function () {
         try {
             async.waterfall([
                 async.apply(serverdb.update),

@@ -1,13 +1,20 @@
+//Config
+var nconf = require('nconf');
+nconf.use('memory').argv().env();
+if (nconf.get('NODE_ENV') != 'production') nconf.set('NODE_ENV', 'development');
+nconf.add('env_config', {type: 'file', file: './config/' + nconf.get('NODE_ENV') + '.json'});
+nconf.add('defaults', {type: 'file', file: './config/default.json'});
+
 //libs
 var _ = require('underscore');
 var fs = require('fs');
 var express = require('express');
 var http = require('http');
 var https = require('https');
-var config = require('./config');
 var log = require('./utils/log')(module);
 var error = require('./utils/error');
 var models = require('./models');
+
 var app = express();
 
 function start() {
@@ -23,24 +30,24 @@ function start() {
     app.use(require('method-override')());
     app.use(require('body-parser')());
     /*app.get('/fill_mongo', function (req, res, next) {
-        var nums = [];
-        for (var i = 0; i < 100; i++)
-            nums[i] = {
-                number: "" + (89060000000 + i),
-                goodness: 20 + _.random(0, 20),
-                createdAt: new Date
-            };
-        for (i = 100; i < 200; i++)
-            nums[i] = {
-                number: "" + (89050000000 + i),
-                goodness: -20 - _.random(0, 20)
-            };
-        models.GlobalNumber.create(nums, function (err) {
-            if (err)
-                return next(err);
-            res.send(200);
-        });
-    });*/
+     var nums = [];
+     for (var i = 0; i < 100; i++)
+     nums[i] = {
+     number: "" + (89060000000 + i),
+     goodness: 20 + _.random(0, 20),
+     createdAt: new Date
+     };
+     for (i = 100; i < 200; i++)
+     nums[i] = {
+     number: "" + (89050000000 + i),
+     goodness: -20 - _.random(0, 20)
+     };
+     models.GlobalNumber.create(nums, function (err) {
+     if (err)
+     return next(err);
+     res.send(200);
+     });
+     });*/
     app.use('/api', require('./routers/api').router);
     app.get('/', function (req, res) {
         res.json({status: 'server is running'});
@@ -54,17 +61,20 @@ function start() {
 
 start();
 
+var port = nconf.get("port");
+
+
 https.createServer({
-    cert: fs.readFileSync(config.security.server.cert, 'utf8'),
-    key: fs.readFileSync(config.security.server.key, 'utf8')
-}, app).listen(config.https.port, function () {
-    log.info("HTTPS Express server listening on port " + config.https.port);
+    cert: fs.readFileSync(nconf.get("security:server:cert"), 'utf8'),
+    key: fs.readFileSync(nconf.get("security:server:key"), 'utf8')
+}, app).listen(port.https, function () {
+    log.info("HTTPS Express server listening on port " + port.https);
 });
 
 
 http.createServer(function (req, res) {
     res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
     res.end();
-}).listen(config.http.port, function () {
-    log.info("HTTP Redirect server started at " + config.http.port);
+}).listen(port.http, function () {
+    log.info("HTTP Redirect server started at " + port.http);
 });

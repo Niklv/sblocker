@@ -1,5 +1,6 @@
 var fs = require('fs');
 var zlib = require('zlib');
+var nconf = require('nconf');
 var models = require('../models');
 var GlobalNumber = models.GlobalNumber;
 var SystemVariable = models.SystemVariable;
@@ -7,15 +8,15 @@ var async = require('async');
 var sqlite3 = require('sqlite3').verbose();
 var path = require('path');
 var log = require('../utils/log')(module);
-var config = require('../config');
+
 var lockDbDownload = require('../routers/api').lockDbDownload;
 
 
-var DB_FILE_NAME = config.clientdb.name;
-var TABLE_NAME = config.clientdb.table_name;
-var TEMP_POSTFIX = config.temp_postfix;
-var GZIP_POSTFIX = config.gzip_postfix;
-var DATA_PATH = "/../" + config.data_path;
+var DB_FILE_NAME = nconf.get("clientdb:name");
+var TABLE_NAME = nconf.get("clientdb:table_name");
+var TEMP_POSTFIX = nconf.get("temp_postfix");
+var GZIP_POSTFIX = nconf.get("gzip_postfix");
+var DATA_PATH = "/../" + nconf.get("data_path");
 var DB_PATH = path.resolve(__dirname + DATA_PATH + DB_FILE_NAME);
 var GZIPPED_PATH = DB_PATH + GZIP_POSTFIX;
 var TEMP_PATH = DB_PATH + TEMP_POSTFIX;
@@ -53,8 +54,8 @@ function create(callback) {
                 log.debug("Aggregate global numbers");
                 GlobalNumber.aggregate(
                     {$match: {$or: [
-                        {goodness: {$gte: config.criteria.wl}},
-                        {goodness: {$lte: -config.criteria.bl}}
+                        {goodness: {$gte: nconf.get("criteria:wl")}},
+                        {goodness: {$lte: -nconf.get("criteria:bl")}}
                     ]}},
                     {$project: {
                         _id: 0,
@@ -124,7 +125,7 @@ function create(callback) {
             },
             function (done) {
                 log.debug("Updete db version number");
-                models.SystemVariable.incClientDbVersion(done);
+                SystemVariable.incClientDbVersion(done);
             }
         ],
         function (err, version) {

@@ -3,7 +3,7 @@ var _ = require("underscore");
 var fs = require("fs");
 var path = require("path");
 var async = require("async");
-var config = require("../config");
+var nconf = require("nconf");
 var ServerError = require("../utils/error").ServerError;
 var log = require('../utils/log')(module);
 var tokenUtils = require('../controllers/token');
@@ -81,7 +81,7 @@ api.get('/phone_db', function (req, res, next) {
     var req_db_version = parseInt(req.get('If-None-Match'));
     SystemVariable.getClientDbVersion(function (err, version) {
         if (err || (version != req_db_version)) {
-            var dbpath = path.resolve(__dirname + '/../' + config.data_path + config.clientdb.name + config.gzip_postfix);
+            var dbpath = path.resolve(__dirname + '/../' + nconf.get("data_path") + nconf.get("clientdb:name") + nconf.get("gzip_postfix"));
             fs.exists(dbpath, function (exists) {
                 if (exists) {
                     res.setHeader('Status Code', 200);

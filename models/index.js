@@ -1,12 +1,11 @@
 var mongoose = require('mongoose');
-var _ = require('underscore');
 var log = require('../utils/log')(module);
-var config = require('../config');
+var nconf = require('nconf');
 
-mongoose.connect('mongodb://' + config.mongo.url + '/' + config.mongo.db, {
+mongoose.connect(nconf.get("mongo:url"), {
     db: { native_parser: true},
-    user: config.mongo.user,
-    pass: config.mongo.pwd
+    user: nconf.get("mongo:user"),
+    pass: nconf.get("mongo:pass")
 });
 
 mongoose.connection.on('error', function (err) {

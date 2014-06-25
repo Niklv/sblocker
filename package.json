@@ -32,7 +32,7 @@
     "mongoose": "^3.9.0",
     "cron": "^1.0.4",
     "request": "^2.36.0",
-    "node-gcm": "^0.9.11"
+    "nconf": "^0.6.9"
   },
   "engines": {
     "node": ">=0.10",

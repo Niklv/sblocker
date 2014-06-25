@@ -1,6 +1,6 @@
 var async = require('async');
 var models = require('../models');
-var config = require('../config');
+var nconf = require('nconf');
 var log = require('../utils/log')(module);
 var UserNumber = models.UserNumber;
 var GlobalNumber = models.GlobalNumber;
@@ -40,8 +40,8 @@ function update(cb) {
                     }},
                     {$group: {_id: "$number", goodness: {$sum: "$goodness"}}},
                     {$match: {$or: [
-                        {goodness: {$gte: config.criteria.wl}},
-                        {goodness: {$lte: -config.criteria.bl}}
+                        {goodness: {$gte: nconf.get("criteria:wl")}},
+                        {goodness: {$lte: -nconf.get("criteria:bl")}}
                     ]}},
                     done
                 );

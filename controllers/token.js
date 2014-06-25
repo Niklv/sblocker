@@ -1,6 +1,6 @@
 var jwt = require('jwt-simple');
 var request = require('request');
-var config = require('../config');
+var nconf = require('nconf');
 var log = require('../utils/log')(module);
 
 var googleCerificates = {
@@ -11,7 +11,7 @@ var googleCerificates = {
 function updateCertificates(callback) {
     log.info("Start updating google certificates");
     request({
-        url: config.token.google_cert,
+        url: nconf.get("token:google_cert"),
         json: true
     }, function (err, res, body) {
         if (!err && res.statusCode == 200) {
@@ -69,14 +69,21 @@ function decodeToken(token) {
 
 function verifyToken(token) {
     return ((token)
-        //&& (token.azp == config.token.azp)
-        //&& (token.aud == config.token.aud)
-        //&& (token.email_verified)
+        && (token.azp == nconf.get("token:azp"))
+        && (token.aud == nconf.get("token:aud"))
+        && (token.email_verified)
         && (token.exp > (new Date()).getTime() / 1000)
         );
+}
+
+function verifyTokenDev(token) {
+    return ((token) && (token.exp > (new Date()).getTime() / 1000));
 }
 
 
 module.exports.updateCertificates = updateCertificates;
 module.exports.decodeToken = decodeToken;
-module.exports.verifyToken = verifyToken;
+if (nconf.get("NODE_ENV") == "production")
+    module.exports.verifyToken = verifyToken;
+else
+    module.exports.verifyToken = verifyTokenDev;
