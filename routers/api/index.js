@@ -4,11 +4,11 @@ var fs = require("fs");
 var path = require("path");
 var async = require("async");
 var nconf = require("nconf");
-var ServerError = require("../utils/error").ServerError;
-var log = require('../utils/log')(module);
-var tokenUtils = require('../controllers/token');
+var ServerError = require("../../utils/error").ServerError;
+var log = require('../../utils/log')(module);
+var tokenUtils = require('../../controllers/token');
 var ObjectId = require('mongoose').Types.ObjectId;
-var Models = require('../models');
+var Models = require('../../models');
 var User = Models.User;
 var UserNumber = Models.UserNumber;
 var SystemVariable = Models.SystemVariable;
@@ -24,11 +24,6 @@ function lockDbDownload(isLocked) {
         log.debug("ClientDb download is unlocked");
     isDownloadLocked = isLocked;
 }
-
-function getUser(token) {
-
-}
-
 
 api.use(function (req, res, next) {
     var params = req.query;
@@ -61,7 +56,7 @@ api.use(function (req, res, next) {
                 });
                 user.save(done)
             } else if (user.isBanned)
-                next(new ServerError("User " + user.email + " banned", 1005, 403));
+                done(new ServerError("User " + user.email + " banned", 1005, 403), null);
             else
                 done(null, user);
         }
@@ -81,7 +76,7 @@ api.get('/phone_db', function (req, res, next) {
     var req_db_version = parseInt(req.get('If-None-Match'));
     SystemVariable.getClientDbVersion(function (err, version) {
         if (err || (version != req_db_version)) {
-            var dbpath = path.resolve(__dirname + '/../' + nconf.get("data_path") + nconf.get("clientdb:name") + nconf.get("gzip_postfix"));
+            var dbpath = path.resolve(__dirname + '/../../' + nconf.get("data_path") + nconf.get("clientdb:name") + nconf.get("gzip_postfix"));
             fs.exists(dbpath, function (exists) {
                 if (exists) {
                     res.setHeader('Status Code', 200);
@@ -168,5 +163,8 @@ api.post('/change_phone', function (req, res, next) {
     }
 );
 
+api.use('/user', require('./user').router);
+
 module.exports.router = api;
 module.exports.lockDbDownload = lockDbDownload;
+
