@@ -12,6 +12,9 @@ var user = new Schema({
         type: Boolean,
         default: false
     },
+    androidRegistrationId:{
+        type: String
+    },
     isBanned: {
         type: Boolean,
         default: false

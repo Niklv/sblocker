@@ -59,6 +59,7 @@ function start() {
     log.info("Server config complete!");
 }
 
+log.info("Launch in " + nconf.get('NODE_ENV'));
 start();
 
 var port = nconf.get("port");
