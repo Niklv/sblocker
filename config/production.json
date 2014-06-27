@@ -8,14 +8,14 @@
         "pass": "SYFGsBY&g9&gEG9hfusn02n0fN:wm cmawf_JSRBGBS824t240cwm&#m2"
     },
     "port": {
-        "https": 20304,
-        "http": 20305
+        "https": 20302,
+        "http": 20303
     },
     "gcm": {
         "dry_run": false
     },
     "criteria": {
-        "wl": 10,
-        "bl": 10
+        "wl": 2,
+        "bl": 2
     }
 }
