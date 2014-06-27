@@ -5,6 +5,7 @@ var CronJob = cron.CronJob;
 var token = require('./token');
 var serverdb = require('./serverdb');
 var clientdb = require('./clientdb');
+var push_notification = require('./push_notification');
 var log = require('../utils/log')(module);
 
 
@@ -25,13 +26,15 @@ function getClientDbCronJob() {
             async.waterfall([
                 async.apply(serverdb.update),
                 function (info, done) {
-                    if (info)
-                        clientdb.create(done);
+                    if (!info)
+                        async.waterfall([
+                            async.apply(clientdb.create),
+                            async.apply(push_notification.pushClientDbUpdate)
+                        ], done);
                     else {
                         log.info("ClientDB update is not necessary");
                         done();
                     }
-
                 }
             ], function (err) {
                 if (err) {
