@@ -28,7 +28,7 @@ function start() {
     app.use(require('method-override')());
     app.use(require('compression')());
     app.use(require('method-override')());
-    app.use(require('body-parser')());
+    app.use(require('body-parser').json());
     /*app.get('/fill_mongo', function (req, res, next) {
      var nums = [];
      for (var i = 0; i < 100; i++)
