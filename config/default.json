@@ -3,8 +3,10 @@
         "updateTokenTime": "0 */30 * * * *"
     },
     "gcm": {
+        "retries": 2,
         "sender": "81527757855",
-        "server_api_key": "AIzaSyCc2_UwqljM_a9BFmRyTa05Wyuh7H-4GIA"
+        "server_api_key": "AIzaSyCc2_UwqljM_a9BFmRyTa05Wyuh7H-4GIA",
+        "pushTTL": 86400
     },
     "token": {
         "google_cert": "https://www.googleapis.com/oauth2/v1/certs",

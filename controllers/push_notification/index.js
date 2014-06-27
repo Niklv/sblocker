@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var nconf = require('nconf');
 var async = require('async');
 var android = require('./android');
 var log = require('../../utils/log')(module);
@@ -13,58 +14,68 @@ function pushClientDbUpdate(callback) {
             SystemVariable.getClientDbVersion(done);
         },
         function (version, done) {
-            var stream = User.find({
-                    androidRegistrationId: {$exists: true},
-                    //isBanned: false,
-                    isEmailVerified: true},
-                {androidRegistrationId: 1}/*,
-                 function (err, data) {
-                 done(err, data, version);
-                 }*/).stream();
-
-            var chunk1000 = [];
+            var chunk = [],
+                chunk_size = 1000,
+                globalERR = null,
+                message = {
+                    collapse_key: "database_update_message",
+                    delay_while_idle: true,
+                    time_to_live: nconf.get('gcm:pushTTL'),
+                    data: {
+                        message: "Database update available!",
+                        version: version
+                    }
+                },
+                nBatch = 1,
+                stream = User.find({
+                        androidRegistrationId: {$exists: true},
+                        isBanned: false, isEmailVerified: true},
+                    {androidRegistrationId: 1})
+                    .lean()
+                    .batchSize(chunk_size)
+                    .stream();
+            log.info('Stream start');
             stream.on('data', function (doc) {
-                console.log(chunk1000.length);
-                if (chunk1000.length < 1000)
-                    chunk1000.push(doc);
-                else
-                    chunk1000 = [doc];
-                // do something with the mongoose document
+                chunk.push(doc);
+                if (chunk.length >= chunk_size) {
+                    stream.pause();
+                    log.info("Start process batch" + nBatch++);
+                    async.waterfall([
+                        async.apply(android.push, message, chunk.map(function (item) {
+                            return item.androidRegistrationId;
+                        })),
+                        function (data, done) {
+                            var clear = [];
+                            log.info("Success : " + data.success);
+                            if (data.failure)
+                                log.error("Failure : " + data.failure);
+                            data.results.forEach(function (item, index) {
+                                if (_.has(item, "error") && item.error) clear.push(chunk[index]);
+                            });
+                            User.update({_id: {$in: clear}}, {$unset: {androidRegistrationId: ""}}, done);
+                        }
+                    ], function (err) {
+                        log.info("End process batch");
+                        chunk = [];
+                        if (err) {
+                            log.error(err.stack);
+                            stream.destroy(new Error("Process stream error"));
+                        } else
+                            stream.resume();
+                    });
+                }
             }).on('error', function (err) {
-                // handle the error
-                console.log('error', err);
+                log.error('Stream error', err.stack);
+                globalERR = err;
             }).on('close', function () {
-                // the stream is closed
-                console.log('close');
-                done(null, null, null);
+                log.info('Stream close');
+                done(globalERR);
             });
-        },
-        function (regIds, version, done) {
-            /*
-             var chunks = [];
-             log.info("Start add");
-             for (var i = 0; i < 99999999; i++)
-             regIds.push(i);
-             log.info("Start slice");
-             var j, chunk = 1000;
-             for (i = 0, j = regIds.length; i < j; i += chunk) {
-             chunks = regIds.slice(i, i + chunk);
-             // do whatever
-             }
-             log.info("End slice");
-             log.info(chunks.length);*/
-            done()
-        },
-        function (done) {
-            //analyze errors from gcm send
-            done()
         }
-    ], function (err, data) {
-        callback && callback(err, data);
+    ], function (err) {
+        callback && callback(err);
     });
-
-
 }
 
 module.exports.pushClientDbUpdate = pushClientDbUpdate;
-module.exports.android = require('./android');
+module.exports.android = android;

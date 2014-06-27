@@ -1,17 +1,18 @@
 var _ = require("underscore");
-var request = require('request');
 var nconf = require('nconf');
+var retry = require('retry');
+var request = require('request');
 var log = require('../../utils/log')(module);
 
-var default_opts = {
-    uri: 'https://android.googleapis.com/gcm/send',
-    headers: {
-        Authorization: 'key=' + nconf.get("gcm:server_api_key")
-    }
-};
-
-
 function push(message, registrationIds, callback) {
+    var opts = {
+        uri: 'https://android.googleapis.com/gcm/send',
+        headers: {
+            Authorization: 'key=' + nconf.get("gcm:server_api_key")
+        }
+    };
+    log.info("Send message");
+    log.info(message);
     if (!_.isObject(message))
         return callback(new Error("No message provided"));
     if (!_.has(message, "time_to_live"))
@@ -20,10 +21,32 @@ function push(message, registrationIds, callback) {
         return callback(new Error("No registrationIds provided"));
     if (registrationIds.length > 1000)
         return callback(new Error("Too many registrationIds provided"));
-    var opts = _.extend(default_opts, {registration_ids: registrationIds, json: message});
-    opts.dry_run = nconf.get("gcm:dry_run");
-    request.post(opts, function (err, response, body) {
-        callback || callback(err, response, body);
+    opts.json = _.clone(message);
+    opts.json.registration_ids = registrationIds;
+    opts.json.dry_run = nconf.get("gcm:dry_run");
+    var operation = retry.operation({retries: nconf.get("gcm:retries"), factor: 3});
+    operation.attempt(function (currentAttempt) {
+        log.info("Send message attempt " + currentAttempt);
+        request.post(opts, function (err, response, body) {
+            if (!err)
+                if (typeof body != "object")
+                    err = new Error("No JSON response");
+                else if (response.statusCode != 200)
+                    err = new Error("Response code not 200");
+                else if (!_.has(body, "multicast_id")
+                    || !_.has(body, "success")
+                    || !_.has(body, "failure")
+                    || !_.has(body, "canonical_ids")
+                    || !_.has(body, "results"))
+                    err = new Error("Not enough fileds");
+            if (err) {
+                log.error("Body:", body);
+                log.error(err.stack);
+            }
+            if (operation.retry(err))
+                return;
+            callback && callback(err ? operation.mainError() : null, body);
+        });
     });
 }
 
@@ -47,6 +70,7 @@ function pushMessage() {
 }
 
 module.exports.pushMessage = pushMessage;
+module.exports.push = push;
 
 
 
