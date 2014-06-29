@@ -33,7 +33,10 @@
     "cron": "^1.0.4",
     "request": "^2.36.0",
     "nconf": "^0.6.9",
-    "retry": "^0.6.1"
+    "retry": "^0.6.1",
+    "ect": "^0.5.9",
+    "passport": "^0.2.0",
+    "passport-local": "^1.0.0"
   },
   "engines": {
     "node": ">=0.10",

@@ -49,6 +49,7 @@ function start() {
      });
      });*/
     app.use('/api', require('./routers/api').router);
+    app.use('/admin', require('./routers/admin').router);
     app.get('/', function (req, res) {
         res.json({status: 'server is running'});
     });
