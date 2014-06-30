@@ -8,9 +8,11 @@ nconf.add('defaults', {type: 'file', file: './config/default.json'});
 //libs
 var _ = require('underscore');
 var fs = require('fs');
+var ECT = require('ect');
 var express = require('express');
 var http = require('http');
 var https = require('https');
+var bodyParser = require('body-parser');
 var log = require('./utils/log')(module);
 var error = require('./utils/error');
 var models = require('./models');
@@ -25,10 +27,16 @@ function start() {
     if (app.get('env') === 'development') {
         app.use(require('morgan')('dev'));
     }
+    var ectRenderer = ECT({ watch: true, root: __dirname + '/views', ext: '.ect' });
+    app.set('view engine', 'ect');
+    app.engine('ect', ectRenderer.render);
+    app.use('/', express.static(__dirname + '/public'));
     app.use(require('method-override')());
     app.use(require('compression')());
     app.use(require('method-override')());
-    app.use(require('body-parser').json());
+    app.use(bodyParser.urlencoded({extended: true}));
+    app.use(bodyParser.json());
+
     /*app.get('/fill_mongo', function (req, res, next) {
      var nums = [];
      for (var i = 0; i < 100; i++)

@@ -1,19 +1,18 @@
 var mongoose = require('mongoose');
-var bcrypt = require('bcrypt');
+var nconf = require('nconf');
+var bcrypt = require('bcrypt-nodejs');
 var Schema = mongoose.Schema;
 
 
 var admin = new Schema({
-    email: {
+    username: {
         type: String,
         require: true,
         index: { unique: true }
     },
     password: {
-        type: String
-    },
-    salt: {
-        type: String
+        type: String,
+        required: true
     },
     createdAt: {
         type: Date,
@@ -21,13 +20,24 @@ var admin = new Schema({
     }
 });
 
-admin.methods.generateHash = function (password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-};
+admin.pre('save', function (next) {
+    var admin = this;
+    if (!admin.isModified('password')) return next();
+    bcrypt.genSalt(nconf.get('SALT_WORK_FACTOR'), function (err, salt) {
+        if (err) return next(err);
+        bcrypt.hash(admin.password, salt, null, function (err, hash) {
+            if (err) return next(err);
+            admin.password = hash;
+            next();
+        });
+    });
+});
 
-
-admin.methods.validPassword = function (password) {
-    return bcrypt.compareSync(password, this.local.password);
+admin.methods.comparePassword = function (candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+        if (err) return cb(err);
+        cb(null, isMatch);
+    });
 };
 
 module.exports = mongoose.model('admin', admin);

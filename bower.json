@@ -1,0 +1,13 @@
+{
+  "name": "sblocker-server",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Niklv/sblocker",
+  "author": [
+    "Lvov Nikita <niklvov@gmail.com>"
+  ],
+  "dependencies": {
+    "bootstrap": "3.*.*",
+    "jquery": "2.*.*",
+    "font-awesome": "~4.1.0"
+  }
+}

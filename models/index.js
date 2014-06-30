@@ -22,3 +22,4 @@ module.exports.GlobalNumber = require('./global_number');
 module.exports.UserNumber = require('./user_number');
 module.exports.SystemVariable = require('./system_variable');
 module.exports.User = require('./user');
+module.exports.Admin = require('./admin');

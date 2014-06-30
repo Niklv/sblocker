@@ -1,6 +1,6 @@
 {
     "cron": {
-        "updateDBTime": "*/60 * * * * *"
+        "updateDBTime": "0 */60 * * * *"
     },
     "mongo": {
         "url": "mongodb://37.139.15.10:27017/sblocker_dev",

@@ -1,4 +1,5 @@
 .idea/
 node_modules/
+bower_components/
 content/data/client.sqlite3
 content/data/client.sqlite3.gz
