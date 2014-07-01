@@ -4,13 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><% content 'page-title' %></title>
-    <link href="/css/lib.css" rel="stylesheet">
-    <link href="/css/admin.css" rel="stylesheet">
+    <% include 'admin/partials/styles' %>
+
 </head>
 
 <body>
-<% content %>
-<script src="/js/lib.js"></script>
-<script src="/js/admin.js"></script>
+<div id="wrapper">
+    <% content %>
+</div>
+<% include 'admin/partials/scripts' %>
 </body>
 </html>

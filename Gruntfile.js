@@ -11,7 +11,9 @@ module.exports = function (grunt) {
                 src: [
                     'bower_components/jquery/dist/jquery.min.js',
                     'bower_components/metisMenu/jquery.metisMenu.js',
-                    'bower_components/bootstrap/dist/js/bootstrap.min.js'
+                    'bower_components/bootstrap/dist/js/bootstrap.min.js',
+                    'bower_components/datatables/media/js/jquery.dataTables.js',
+                    'public/js/lib/dataTables.bootstrap.js'
                 ],
                 dest: 'public/js/lib.js'
             }

@@ -23,7 +23,10 @@
             "key": "content/security/server/key.pem"
         }
     },
-    "session_secret": "noc8qt7vnqpc37tgw3tcm03g73x7tctnw3m9x4ctg903mgh379ctmwx3",
+    "session": {
+        "secret": "noc8qt7vnqpc37tgw3tcm03g73x7tctnw3m9x4ctg903mgh379ctmwx3",
+        "maxage": 2592000000
+    },
     "SALT_WORK_FACTOR": 10,
     "data_path": "content/data/",
     "temp_postfix": ".temp",

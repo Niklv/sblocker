@@ -1,0 +1,31 @@
+<script src="/js/lib.js"></script>
+<script src="/js/admin.js"></script>
+
+
+<script>
+    $(document).ready(function () {
+        $('.dataTable').each(function (index, table) {
+            $(table).dataTable();
+        });
+        $('.push-this').each(function (index, button) {
+            $(button).click(function () {
+                $(button).addClass('disabled');
+                $.ajax({
+                    url: "/admin/api/push",
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {_id: $(button).attr("_id"), type: 'android'},
+                    context: document.body
+                }).done(function () {
+                    $(button).removeClass('disabled');
+                    console.log(arguments);
+                }).error(function () {
+                    $(button).removeClass('disabled');
+                    console.log(arguments);
+                });
+            });
+        });
+    });
+</script>
+
+

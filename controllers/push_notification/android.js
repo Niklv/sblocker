@@ -23,7 +23,8 @@ function push(message, registrationIds, callback) {
         return callback(new Error("Too many registrationIds provided"));
     opts.json = _.clone(message);
     opts.json.registration_ids = registrationIds;
-    opts.json.dry_run = nconf.get("gcm:dry_run");
+    if (!opts.json.dry_run)
+        opts.json.dry_run = nconf.get("gcm:dry_run");
     var operation = retry.operation({retries: nconf.get("gcm:retries"), factor: 3});
     operation.attempt(function (currentAttempt) {
         log.info("Send message attempt " + currentAttempt);

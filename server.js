@@ -33,7 +33,6 @@ function start() {
     app.use('/', express.static(__dirname + '/public'));
     app.use(require('method-override')());
     app.use(require('compression')());
-    app.use(require('method-override')());
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
 
@@ -57,7 +56,7 @@ function start() {
      });
      });*/
     app.use('/api', require('./routers/api').router);
-    app.use('/admin', require('./routers/admin').router);
+    app.use('/admin/', require('./routers/admin').router);
     app.get('/', function (req, res) {
         res.json({status: 'server is running'});
     });
