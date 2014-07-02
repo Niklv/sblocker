@@ -144,7 +144,6 @@ router.post('/api/custom_push', function (req, res, next) {
         if (_.isNaN(msg.time_to_live) || _.isNull(msg.time_to_live) || _.isUndefined(msg.time_to_live))
             delete msg.time_to_live;
     }
-
     android.push(msg, null, function (err, data) {
         if (err)
             return res.json(200, {err: {msg: err.message}});
@@ -152,6 +151,7 @@ router.post('/api/custom_push', function (req, res, next) {
         res.json(200, {status: "Ok!", data: data});
     });
 });
+
 
 
 module.exports.router = router;

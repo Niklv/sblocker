@@ -48,7 +48,7 @@ $(document).ready(function () {
                 return false;
             } else {
                 $('input#regId').parent().removeClass('has-error');
-                real_msg.registration_ids = form_msg.regId.replace(/ /g,'').split(',');
+                real_msg.registration_ids = form_msg.regId.replace(/ /g, '').split(',');
             }
 
             if (form_msg.collapse_key && form_msg.collapse_key.length)
@@ -95,6 +95,16 @@ $(document).ready(function () {
             });
             return false;
         }
-    )
-    ;
+    );
+
+    var socket = io.connect('https://localhost:20302');
+    console.log(socket);
+    var rt_logs = $('#rt-logs');
+    socket.on('news', function (data) {
+        console.log(rt_logs);
+        rt_logs.val(rt_logs.val() + JSON.stringify(data, null, "\t"));
+        socket.emit('my other event', { my: 'data' });
+
+    });
+
 });

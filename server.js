@@ -10,6 +10,7 @@ var _ = require('underscore');
 var fs = require('fs');
 var ECT = require('ect');
 var express = require('express');
+var morgan = require('morgan');
 var http = require('http');
 var https = require('https');
 var bodyParser = require('body-parser');
@@ -25,7 +26,12 @@ function start() {
     app.disable('x-powered-by');
     app.disable('etag');
     if (app.get('env') === 'development') {
-        app.use(require('morgan')('dev'));
+        app.use(morgan({
+            format: 'dev',
+            stream: { write: function (message, encoding) {
+                log.debug(message.replace(/(\r\n|\n|\r)/gm, ""));
+            }}
+        }));
     }
     var ectRenderer = ECT({ watch: true, root: __dirname + '/views', ext: '.ect' });
     app.set('view engine', 'ect');
@@ -73,15 +79,17 @@ start();
 var port = nconf.get("port");
 
 
-https.createServer({
+var httpsServer = https.createServer({
     cert: fs.readFileSync(nconf.get("security:server:cert"), 'utf8'),
     key: fs.readFileSync(nconf.get("security:server:key"), 'utf8')
 }, app).listen(port.https, function () {
     log.info("HTTPS Express server listening on port " + port.https);
 });
 
+require('./controllers/logs.io')(httpsServer);
 
-http.createServer(function (req, res) {
+
+var httpServer = http.createServer(function (req, res) {
     res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
     res.end();
 }).listen(port.http, function () {
