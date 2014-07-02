@@ -36,6 +36,60 @@
                 </div>
             </div>
         </div>
+        <div class="col-lg-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">Send custom push (<a href="http://developer.android.com/google/gcm/server.html" target="_blank">info</a>)</div>
+                <div class="panel-body">
+                    <form id="custom_push_form" role="form">
+                        <div class="form-group">
+                            <label for="regId">Registration ID</label>
+                            <input id="regId" name="regId" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="collapse_key">collapse_key</label>
+                            <input id="collapse_key" name="collapse_key" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="data_value1">data.message</label>
+                            <input id="data_value1" name="data[message]" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="data_value2">data.another_value</label>
+                            <input id="data_value2" name="data[another_value]" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="time_to_live">time_to_live</label>
+                            <input id="time_to_live" name="time_to_live" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="dry_run" name="dry_run" value="true">dry_run
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" id="delay_while_idle" name="delay_while_idle" value="true">delay_while_idle
+                                </label>
+                            </div>
+                        </div>
+                        <button id="#push-custom" type="submit" class="btn btn-default btn-primary btn-block"><i
+                                class="fa fa-android fa-fw"></i> Push
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">Response</div>
+                <div id="custom-push-result" class="panel-body">
+
+                </div>
+            </div>
+        </div>
     </div>
 
 

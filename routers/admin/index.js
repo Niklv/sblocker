@@ -95,7 +95,7 @@ router.get('/logout', ensureAuthenticated, function (req, res) {
 });
 
 router.use('/', function (err, req, res, next) {
-    res.render('admin/err', {err: err});
+    res.render('admin/error', {err: err});
 });
 
 
@@ -127,6 +127,31 @@ router.post('/api/push', function (req, res, next) {
     });
 });
 
+router.post('/api/custom_push', function (req, res, next) {
+    var msg = {};
+    if (_.has(req.body, "registration_ids") && _.isArray(req.body.registration_ids))
+        msg.registration_ids = req.body.registration_ids;
+    else
+        return res.json(200, {err: {
+            msg: "No registration_ids"
+        }});
+    if (!_.has(req.body, "dry_run"))
+        msg.dry_run = (req.body.dry_run === "true");
+    if (!_.has(req.body, "delay_while_idle"))
+        msg.delay_while_idle = (req.body.delay_while_idle === "true");
+    if (!_.has(req.body, "time_to_live")) {
+        msg.time_to_live = parseInt(req.body.time_to_live);
+        if (_.isNaN(msg.time_to_live) || _.isNull(msg.time_to_live) || _.isUndefined(msg.time_to_live))
+            delete msg.time_to_live;
+    }
+
+    android.push(msg, null, function (err, data) {
+        if (err)
+            return res.json(200, {err: {msg: err.message}});
+        log.info(data);
+        res.json(200, {status: "Ok!", data: data});
+    });
+});
+
 
 module.exports.router = router;
-

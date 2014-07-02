@@ -15,14 +15,14 @@ function push(message, registrationIds, callback) {
     log.info(message);
     if (!_.isObject(message))
         return callback(new Error("No message provided"));
-    if (!_.has(message, "time_to_live"))
-        return callback(new Error("time_to_live not set in message"));
-    if (!_.isArray(registrationIds) || !registrationIds.length)
-        return callback(new Error("No registrationIds provided"));
-    if (registrationIds.length > 1000)
-        return callback(new Error("Too many registrationIds provided"));
+    if (!_.isArray(message.registration_ids))
+        if (!_.isArray(registrationIds) || !registrationIds.length)
+            return callback(new Error("No registrationIds provided"));
     opts.json = _.clone(message);
-    opts.json.registration_ids = registrationIds;
+    if (!opts.json.registration_ids)
+        opts.json.registration_ids = registrationIds;
+    if (opts.json.registration_ids.length > 1000)
+        return callback(new Error("Too many registrationIds provided"));
     if (!opts.json.dry_run)
         opts.json.dry_run = nconf.get("gcm:dry_run");
     var operation = retry.operation({retries: nconf.get("gcm:retries"), factor: 3});
