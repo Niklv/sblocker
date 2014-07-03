@@ -6,7 +6,7 @@ var token = require('./token');
 var serverdb = require('./serverdb');
 var clientdb = require('./clientdb');
 var push_notification = require('./push_notification');
-var log = require('../utils/log')(module);
+var log = require('log')(module);
 
 
 function getTokenCronJob() {

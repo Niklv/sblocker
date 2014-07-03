@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var log = require('../utils/log')(module);
+var log = require('../controllers/log')(module);
 var nconf = require('nconf');
 
 mongoose.connect(nconf.get("mongo:url"), {

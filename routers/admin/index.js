@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var session = require("express-session");
 var passport = require("passport");
 var android = require('../../controllers/push_notification/android');
-var log = require('../../utils/log')(module);
+var log = require('../../controllers/log')(module);
 
 var router = express.Router();
 

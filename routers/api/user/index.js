@@ -3,7 +3,7 @@ var _ = require("underscore");
 var async = require("async");
 var nconf = require("nconf");
 var ServerError = require("../../../utils/error").ServerError;
-var log = require('../../../utils/log')(module);
+var log = require('../../../controllers/log')(module);
 var Models = require('../../../models');
 var User = Models.User;
 

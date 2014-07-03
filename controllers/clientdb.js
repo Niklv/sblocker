@@ -7,7 +7,7 @@ var SystemVariable = models.SystemVariable;
 var async = require('async');
 var sqlite3 = require('sqlite3').verbose();
 var path = require('path');
-var log = require('../utils/log')(module);
+var log = require('log')(module);
 
 var lockDbDownload = require('../routers/api').lockDbDownload;
 

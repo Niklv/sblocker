@@ -2,7 +2,7 @@ var _ = require("underscore");
 var nconf = require('nconf');
 var retry = require('retry');
 var request = require('request');
-var log = require('../../utils/log')(module);
+var log = require('../log')(module);
 
 function push(message, registrationIds, callback) {
     var opts = {

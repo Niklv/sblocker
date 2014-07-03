@@ -14,7 +14,7 @@ var morgan = require('morgan');
 var http = require('http');
 var https = require('https');
 var bodyParser = require('body-parser');
-var log = require('./utils/log')(module);
+var log = require('./controllers/log')(module);
 var error = require('./utils/error');
 var models = require('./models');
 

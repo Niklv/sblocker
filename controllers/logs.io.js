@@ -1,4 +1,4 @@
-var log = require("../utils/log")(module);
+var log = require("log")(module);
 
 module.exports = function (app) {
     var io = require('socket.io')(app);

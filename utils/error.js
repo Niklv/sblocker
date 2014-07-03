@@ -1,6 +1,6 @@
 var util = require("util");
 var http = require("http");
-var log = require("./log")(module);
+var log = require("./../controllers/log")(module);
 
 function ServerError(message, error_code, http_code) {
     this.http_code = typeof http_code !== 'undefined' ? http_code : 500;
