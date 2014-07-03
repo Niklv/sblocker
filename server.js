@@ -10,7 +10,6 @@ var _ = require('underscore');
 var fs = require('fs');
 var ECT = require('ect');
 var express = require('express');
-var morgan = require('morgan');
 var http = require('http');
 var https = require('https');
 var bodyParser = require('body-parser');
@@ -25,14 +24,6 @@ function start() {
     app.models = models;
     app.disable('x-powered-by');
     app.disable('etag');
-    if (app.get('env') === 'development') {
-        app.use(morgan({
-            format: 'dev',
-            stream: { write: function (message, encoding) {
-                log.debug(message.replace(/(\r\n|\n|\r)/gm, ""));
-            }}
-        }));
-    }
     var ectRenderer = ECT({ watch: true, root: __dirname + '/views', ext: '.ect' });
     app.set('view engine', 'ect');
     app.engine('ect', ectRenderer.render);
@@ -86,7 +77,7 @@ var httpsServer = https.createServer({
     log.info("HTTPS Express server listening on port " + port.https);
 });
 
-require('./controllers/logs.io')(httpsServer);
+require('./controllers/logs.io').create(httpsServer);
 
 
 var httpServer = http.createServer(function (req, res) {

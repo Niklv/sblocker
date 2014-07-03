@@ -1,7 +1,7 @@
 var jwt = require('jwt-simple');
 var request = require('request');
 var nconf = require('nconf');
-var log = require('log')(module);
+var log = require('./log')(module);
 
 var googleCerificates = {
     first: null,

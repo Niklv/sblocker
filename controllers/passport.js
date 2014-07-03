@@ -6,11 +6,16 @@ var Admin = require('../models').Admin;
 module.exports = function (passport) {
 
     passport.serializeUser(function (user, done) {
+        console.log("serializeUser");
+        console.log(user);
         done(null, user.id);
     });
 
     passport.deserializeUser(function (id, done) {
+        console.log("deserializeUser");
+        console.log(_id);
         Admin.findById(id, function (err, user) {
+            console.log(user);
             done(err, user);
         });
     });
@@ -19,7 +24,6 @@ module.exports = function (passport) {
         new LocalStrategy(function (username, password, done) {
             async.waterfall([
                 function (done) {
-                    console.log(username, password);
                     Admin.findOne({ username: username }, done);
                 },
                 function (admin, done) {

@@ -3,6 +3,7 @@ var _ = require("underscore");
 var fs = require("fs");
 var path = require("path");
 var async = require("async");
+var morgan = require('morgan');
 var nconf = require("nconf");
 var ServerError = require("../../utils/error").ServerError;
 var log = require('../../controllers/log')(module);
@@ -23,6 +24,15 @@ function lockDbDownload(isLocked) {
     else
         log.debug("ClientDb download is unlocked");
     isDownloadLocked = isLocked;
+}
+
+if (nconf.get('NODE_ENV') != 'production') {
+    api.use(morgan({
+        format: 'dev',
+        stream: { write: function (message, encoding) {
+            log.debug(message.replace(/(\r\n|\n|\r)/gm, ""));
+        }}
+    }));
 }
 
 api.use(function (req, res, next) {

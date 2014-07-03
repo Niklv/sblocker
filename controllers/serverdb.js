@@ -1,7 +1,7 @@
 var async = require('async');
 var models = require('../models');
 var nconf = require('nconf');
-var log = require('log')(module);
+var log = require('./log')(module);
 var UserNumber = models.UserNumber;
 var GlobalNumber = models.GlobalNumber;
 

@@ -6,6 +6,7 @@ var flash = require("connect-flash");
 var models = require("../../models");
 var cookieParser = require('cookie-parser');
 var session = require("express-session");
+var sessionStore = require('../../controllers/session');
 var passport = require("passport");
 var android = require('../../controllers/push_notification/android');
 var log = require('../../controllers/log')(module);
@@ -15,11 +16,11 @@ var router = express.Router();
 require('../../controllers/passport')(passport);
 router.use(cookieParser());
 router.use(session({
-        name: "sblkr.auth",
+        name: nconf.get("cookie_name"),
         secret: nconf.get("session:secret"),
-        store: require('../../controllers/session')(session),
+        store: sessionStore(session),
         cookie: {
-            path: '/admin',
+            path: '/',
             httpOnly: true,
             secure: true,
             maxAge: 1000 //30days nconf.get("session:maxage")
@@ -58,11 +59,6 @@ router.post('/login', function (req, res, next) {
         req.logIn(admin, function (err) {
             if (err)
                 return next(err);
-            if (req.body.remember) {
-                req.session.cookie.maxAge = 1000 * 60 * 3;
-            } else {
-                req.session.cookie.expires = false;
-            }
             return res.redirect('.');
         });
     })(req, res, next);
@@ -151,7 +147,6 @@ router.post('/api/custom_push', function (req, res, next) {
         res.json(200, {status: "Ok!", data: data});
     });
 });
-
 
 
 module.exports.router = router;

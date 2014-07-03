@@ -1,5 +1,5 @@
 var async = require('async');
-var log = require('log')(module);
+var log = require('./log')(module);
 var SystemVariable = require('../models').SystemVariable;
 var nconf = require('nconf');
 

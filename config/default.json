@@ -31,6 +31,8 @@
     "data_path": "content/data/",
     "temp_postfix": ".temp",
     "gzip_postfix": ".gz",
+    "log_level": "debug",
+    "cookie_name": "sblkr.auth",
     "sys_vars": {
         "client_db_version": {
             "name": "client_db_version",

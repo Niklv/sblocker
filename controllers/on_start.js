@@ -2,7 +2,7 @@ var async = require('async');
 var token = require('./token');
 var clientdb = require('./clientdb');
 var system_variable = require('./system_variable');
-var log = require('log')(module);
+var log = require('./log')(module);
 
 
 function onStart() {
