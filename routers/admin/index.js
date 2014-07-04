@@ -7,7 +7,7 @@ var models = require("../../models");
 var cookieParser = require('cookie-parser');
 var session = require("express-session");
 
-var SessionStore = require('../../controllers/sessionStore');
+var SessionStore = require('../../controllers/session_store');
 var passport = require("passport");
 var android = require('../../controllers/push_notification/android');
 var log = require('../../controllers/log')(module);
