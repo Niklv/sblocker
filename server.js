@@ -21,7 +21,6 @@ var app = express();
 
 function start() {
     log.info("Configure server");
-    app.models = models;
     app.disable('x-powered-by');
     app.disable('etag');
     var ectRenderer = ECT({ watch: true, root: __dirname + '/views', ext: '.ect' });

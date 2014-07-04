@@ -6,7 +6,8 @@ var flash = require("connect-flash");
 var models = require("../../models");
 var cookieParser = require('cookie-parser');
 var session = require("express-session");
-var sessionStore = require('../../controllers/session');
+
+var SessionStore = require('../../controllers/sessionStore');
 var passport = require("passport");
 var android = require('../../controllers/push_notification/android');
 var log = require('../../controllers/log')(module);
@@ -16,20 +17,12 @@ var router = express.Router();
 require('../../controllers/passport')(passport);
 router.use(cookieParser());
 router.use(session({
-        name: nconf.get("cookie_name"),
-        secret: nconf.get("session:secret"),
-        store: sessionStore(session),
-        cookie: {
-            path: '/',
-            httpOnly: true,
-            secure: true,
-            maxAge: 1000 //30days nconf.get("session:maxage")
-        },
-        resave: true,
-        saveUninitialized: false,
-        unset: "destroy"
-    }
-));
+    name: nconf.get("cookie_name"),
+    secret: nconf.get("session:secret"),
+    resave: true,
+    saveUninitialized: true,
+    store: new SessionStore()
+}));
 router.use(passport.initialize());
 router.use(passport.session());
 router.use(flash());
@@ -56,9 +49,16 @@ router.post('/login', function (req, res, next) {
             return next(err);
         if (!admin)
             return res.render('admin/login', info);
-        req.logIn(admin, function (err) {
+        req.login(admin, function (err) {
             if (err)
                 return next(err);
+            if (req.body.remember) {
+                var two_weeks = 1000 * 60 * 60 * 24 * 14;
+                req.session.cookie.maxAge = two_weeks;
+                req.session.cookie.expires = new Date(Date.now() + two_weeks);
+            } else {
+                req.session.cookie.expires = false;
+            }
             return res.redirect('.');
         });
     })(req, res, next);
@@ -81,7 +81,7 @@ router.get('/android_push', function (req, res) {
 
 });
 
-router.get('/logout', ensureAuthenticated, function (req, res) {
+router.get('/logout', function (req, res) {
     req.session.destroy(function (err) {
         if (err)
             log.error(err.stack);

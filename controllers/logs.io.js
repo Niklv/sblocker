@@ -1,7 +1,7 @@
 var EventEmitter = require('events').EventEmitter;
 var passportSocketIo = require("passport.socketio");
 var cookieParser = require('cookie-parser');
-var sessionStore = require("./session");
+var sessionStore = require("./sessionStore");
 var nconf = require("nconf");
 var emitter = new EventEmitter;
 

@@ -6,16 +6,11 @@ var Admin = require('../models').Admin;
 module.exports = function (passport) {
 
     passport.serializeUser(function (user, done) {
-        console.log("serializeUser");
-        console.log(user);
-        done(null, user.id);
+        done(null, user._id);
     });
 
     passport.deserializeUser(function (id, done) {
-        console.log("deserializeUser");
-        console.log(_id);
         Admin.findById(id, function (err, user) {
-            console.log(user);
             done(err, user);
         });
     });
