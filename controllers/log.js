@@ -32,9 +32,9 @@ function getLogger(module) {
     logger.on('logging', function (transport, level, msg, meta) {
         if (_.isEmpty(meta) && !msg.length)
             return;
-        var str = transport.timestamp() + "\t" + level;
+        var str = transport.timestamp() + " " + level + ":\t[" + transport.label + "]";
         if (msg.length)
-            str += ":\t" + msg;
+            str += "\t" + msg;
         if (!_.isEmpty(meta))
             str += "\t" + JSON.stringify(meta, null, "\t");
         emitter.emit('logging', str);

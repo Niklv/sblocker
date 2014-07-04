@@ -1,7 +1,6 @@
 <% extend 'admin/layout' %>
 <% block 'page-title' : %>Error<% end %>
 <div id="wrapper">
-    <% include 'admin/partials/navbar' %>
     <div id="page-wrapper">
         <% include 'admin/partials/header' %>
         <%- @.err.stack.replace(/(?:\r\n|\r|\n)/g, '<br />') %>

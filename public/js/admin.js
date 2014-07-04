@@ -13,6 +13,13 @@ $(function () {
     })
 });
 
+function getCookie(name) {
+    var matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
 $(document).ready(function () {
     $('.dataTable').each(function (index, table) {
         $(table).dataTable();
@@ -99,16 +106,12 @@ $(document).ready(function () {
         $("#autoscroll").toggleClass("active")
     });
 
-
-    //var socket = io.connect('https://localhost:20302');
-    /*var socket = io.connect('//' + window.location.host, {
-        query: 'session_id=' + $.cookie('sblkr.auth')
-    });
+    var socket = io.connect('https://' + window.location.host);
     var rt_logs = $('#rt-logs');
     socket.on('log', function (data) {
         rt_logs.val(rt_logs.val() + data + "\n");
         if ($("#autoscroll").hasClass("active"))
             rt_logs.scrollTop(rt_logs[0].scrollHeight - rt_logs.height());
-    });*/
+    });
 
 });

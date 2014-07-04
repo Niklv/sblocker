@@ -21,7 +21,10 @@ router.use(session({
     secret: nconf.get("session:secret"),
     resave: true,
     saveUninitialized: true,
-    store: new SessionStore()
+    store: new SessionStore(),
+    cookie: {
+        httpOnly: true
+    }
 }));
 router.use(passport.initialize());
 router.use(passport.session());
@@ -147,6 +150,5 @@ router.post('/api/custom_push', function (req, res, next) {
         res.json(200, {status: "Ok!", data: data});
     });
 });
-
 
 module.exports.router = router;
