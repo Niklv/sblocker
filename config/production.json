@@ -3,7 +3,7 @@
         "updateDBTime": "0 10 * * * *"
     },
     "mongo": {
-        "url": "mongodb://37.139.15.10:27017/sblocker",
+        "url": "mongodb://localhost:27017/sblocker",
         "user": "node_sblocker",
         "pass": "SYFGsBY&g9&gEG9hfusn02n0fN:wm cmawf_JSRBGBS824t240cwm&#m2"
     },
